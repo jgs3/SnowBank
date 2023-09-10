@@ -30,11 +30,6 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
 
     constructor(address _routerAddress, address _devAddress) ERC20("wildbase.farm", "WILD") ERC20Permit("WILD") {
         devAddress = _devAddress;
-        IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
-        address WETH = uniswapV2Router.WETH();
-        // Create a uniswap pair for this new token
-        address pair = IPancakeFactory(uniswapV2Router.factory()).createPair(address(this), WETH);
-        isPair[pair] = true;
     }
 
     function mint(address to, uint256 amount) external onlyOwner {

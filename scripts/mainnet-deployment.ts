@@ -4,7 +4,7 @@ const utils = require("../scripts/utils");
 const config = {
     factory: "0x3E84D913803b02A4a7f027165E8cA42C14C0FdE7",
     router: "0x8c1A3cF8f83074169FE5D7aD50B978e1cD6b37c7",
-    startTime: 1694441499, //Date and time (GMT): Thursday, September 7, 2023 2:22:25 PM
+    startTime: 1694535990, //Date and time (GMT): Thursday, September 7, 2023 2:22:25 PM
     devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     masterChefAddress: "0x58f5F2AD3cfC3690B026170c7E3BE0582BE5148A",
@@ -24,46 +24,46 @@ async function main() {
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const router = await ethers.getContractAt("PancakeRouter", config.router);
 
-    const token = await ethers.getContractAt(
-        "WildToken",
-        "0x3Bd80f5c62784D4a31e312E2801025E8c0b3Ad1f"
-    );
-    // await utils.deployAndVerify("WildToken", [router.address, config.devAddress]);
+    // const token = await ethers.getContractAt(
+    //     "WildToken",
+    //     "0x3Bd80f5c62784D4a31e312E2801025E8c0b3Ad1f"
+    // );
+    const token = await utils.deployAndVerify("WildToken", [router.address, config.devAddress]);
 
-    // await token.mint(config.devAddress, ethers.utils.parseEther("250000"));
+    await token.mint(config.devAddress, ethers.utils.parseEther("250000"));
 
-    // const masterChef = await utils.deployAndVerify("WildMasterChef", [
-    //     token.address,
-    //     config.devAddress, //dev address
-    //     config.feeAddress, //fee address
-    //     ethers.utils.parseUnits("1", 18),
-    //     config.startTime,
-    // ]);
+    const masterChef = await utils.deployAndVerify("WildMasterChef", [
+        token.address,
+        config.devAddress, //dev address
+        config.feeAddress, //fee address
+        ethers.utils.parseUnits("1", 18),
+        config.startTime,
+    ]);
 
-    // await token.transferOwnership(masterChef.address);
+    await token.transferOwnership(masterChef.address);
 
-    const masterChef = await ethers.getContractAt("WildMasterChef", config.masterChefAddress);
+    // const masterChef = await ethers.getContractAt("WildMasterChef", config.masterChefAddress);
 
-    // await masterChef.add(120, token.address, 0, false, false);
-    // await masterChef.add(50, config.weth, 300, false, false);
-    // await masterChef.add(30, config.alb, 300, false, false);
+    await masterChef.add(120, token.address, 0, false, false);
+    await masterChef.add(50, config.weth, 300, false, false);
+    await masterChef.add(30, config.alb, 300, false, false);
 
     // const wildWethPair = await factory.getPair(config.weth, token.address);
-    const wildUsdcPair = await factory.getPair(config.usdc, token.address);
-    const wildDaiPair = await factory.getPair(config.dai, token.address);
-    const wildMimPair = await factory.getPair(config.mim, token.address);
+    // const wildUsdcPair = await factory.getPair(config.usdc, token.address);
+    // const wildDaiPair = await factory.getPair(config.dai, token.address);
+    // const wildMimPair = await factory.getPair(config.mim, token.address);
 
     console.log({
         // wildWethPair: wildWethPair,
-        wildUsdcPair: wildUsdcPair,
-        wildDaiPair: wildDaiPair,
-        wildMimPair: wildMimPair,
+        // wildUsdcPair: wildUsdcPair,
+        // wildDaiPair: wildDaiPair,
+        // wildMimPair: wildMimPair,
     });
 
     // await masterChef.add(200, wildWethPair, 200, false, false);
-    await masterChef.add(200, wildUsdcPair, 200, false, false);
-    await masterChef.add(200, wildDaiPair, 200, false, false);
-    await masterChef.add(200, wildMimPair, 200, false, false);
+    // await masterChef.add(200, wildUsdcPair, 200, false, false);
+    // await masterChef.add(200, wildDaiPair, 200, false, false);
+    // await masterChef.add(200, wildMimPair, 200, false, false);
 
     // const zapper = await utils.deployAndVerify("ZapV2", [masterChef.address]);
 
