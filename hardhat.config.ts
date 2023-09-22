@@ -19,22 +19,22 @@ module.exports = {
         hardhat: {
             forking: {
                 enabled: true,
-                url: "https://mainnet.base.org",
+                url: "https://base-mainnet.diamondswap.org/rpc",
                 //blockNumber: 17130449
 
                 // If using blockNumber, RPC node should be archive
             },
         },
         "base-mainnet": {
-            url: "https://mainnet.base.org",
+            url: "https://base-mainnet.diamondswap.org/rpc",
             accounts: config.mainnetAccounts,
             // gasPrice: 1000000000,
         },
         // for testnet
         "base-goerli": {
             url: "https://goerli.base.org",
-            accounts: config.testnetAccounts,
-            gasPrice: 1000000000,
+            accounts: config.mainnetAccounts,
+            // gasPrice: 1000000000,
         },
         "base-devnet": {
             url: "https://rpc.vnet.tenderly.co/devnet/base-devnet/b209b556-47d7-4727-a935-aad569bc879c",

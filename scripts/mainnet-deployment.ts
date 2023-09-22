@@ -2,12 +2,13 @@ import { ethers } from "hardhat";
 const utils = require("../scripts/utils");
 
 const config = {
-    factory: "0x3E84D913803b02A4a7f027165E8cA42C14C0FdE7",
-    router: "0x8c1A3cF8f83074169FE5D7aD50B978e1cD6b37c7",
+    factory: "0x02a84c1b3BBD7401a5f7fa98a384EBC70bB5749E",
+    router: "0x8cFe327CEc66d1C090Dd72bd0FF11d690C33a2Eb",
     startTime: 1694535990, //Date and time (GMT): Thursday, September 7, 2023 2:22:25 PM
     devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
-    masterChefAddress: "0x58f5F2AD3cfC3690B026170c7E3BE0582BE5148A",
+    masterChefAddress: "0xbd47AF44583224A76cF5E23A3aBDC4b7ACeF12A8",
+    wild: "0x7c1f5FAC2Ed605Ba8818dEE87dC41c80674F9f68",
     usdc: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
     weth: "0x4200000000000000000000000000000000000006",
     dai: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
@@ -24,43 +25,42 @@ async function main() {
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const router = await ethers.getContractAt("PancakeRouter", config.router);
 
-    // const token = await ethers.getContractAt(
-    //     "WildToken",
-    //     "0x3Bd80f5c62784D4a31e312E2801025E8c0b3Ad1f"
-    // );
-    const token = await utils.deployAndVerify("WildToken", [router.address, config.devAddress]);
+    // const token = await ethers.getContractAt("WildToken", config.wild);
+    const token = await utils.deployAndVerify("LODGE", [config.usdc, config.router]);
 
-    await token.mint(config.devAddress, ethers.utils.parseEther("250000"));
+    // await token.mint(config.devAddress, ethers.utils.parseEther("250000"));
 
-    const masterChef = await utils.deployAndVerify("WildMasterChef", [
-        token.address,
-        config.devAddress, //dev address
-        config.feeAddress, //fee address
-        ethers.utils.parseUnits("1", 18),
-        config.startTime,
-    ]);
+    // const masterChef = await utils.deployAndVerify("WildMasterChef", [
+    //     token.address,
+    //     config.devAddress, //dev address
+    //     config.feeAddress, //fee address
+    //     ethers.utils.parseUnits("1", 18),
+    //     config.startTime,
+    // ]);
 
-    await token.transferOwnership(masterChef.address);
+    // await token.transferOwnership(masterChef.address);
 
     // const masterChef = await ethers.getContractAt("WildMasterChef", config.masterChefAddress);
 
-    await masterChef.add(120, token.address, 0, false, false);
-    await masterChef.add(50, config.weth, 300, false, false);
-    await masterChef.add(30, config.alb, 300, false, false);
+    // await masterChef.add(120, token.address, 0, false, false);
+    // await masterChef.add(50, config.weth, 300, false, false);
+    // await masterChef.add(30, config.alb, 300, false, false);
 
-    // const wildWethPair = await factory.getPair(config.weth, token.address);
+    const wildWethPair = await factory.getPair(config.weth, token.address);
+    const usdcWethPair = await factory.getPair(config.usdc, token.address);
     // const wildUsdcPair = await factory.getPair(config.usdc, token.address);
     // const wildDaiPair = await factory.getPair(config.dai, token.address);
     // const wildMimPair = await factory.getPair(config.mim, token.address);
 
     console.log({
-        // wildWethPair: wildWethPair,
+        wildWethPair: wildWethPair,
+        usdcWethPair: usdcWethPair,
         // wildUsdcPair: wildUsdcPair,
         // wildDaiPair: wildDaiPair,
         // wildMimPair: wildMimPair,
     });
 
-    // await masterChef.add(200, wildWethPair, 200, false, false);
+    // await masterChef.add(800, wildWethPair, 200, false, false);
     // await masterChef.add(200, wildUsdcPair, 200, false, false);
     // await masterChef.add(200, wildDaiPair, 200, false, false);
     // await masterChef.add(200, wildMimPair, 200, false, false);
@@ -78,7 +78,7 @@ async function main() {
 
     console.log({
         token: token.address,
-        masterChef: masterChef.address,
+        // masterChef: masterChef.address,
         // zapper: zapper.address,
     });
 }
