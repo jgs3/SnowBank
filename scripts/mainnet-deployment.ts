@@ -8,7 +8,7 @@ const config = {
     devAddress: "0x600bE5FcB9338BC3938e4790EFBeAaa4F77D6893",
     feeAddress: "0x600bE5FcB9338BC3938e4790EFBeAaa4F77D6893",
     masterChefAddress: "0xbd47AF44583224A76cF5E23A3aBDC4b7ACeF12A8",
-    wild: "0x4B678D9Ab356eC999Ce996c1c9971026db0fA2D2",
+    wild: "0xD583332c65Ac835268c5DA8c17067f5Ebe23c1c5",
     usdc: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
     weth: "0x4200000000000000000000000000000000000006",
     dai: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
@@ -26,10 +26,10 @@ async function main() {
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const router = await ethers.getContractAt("PancakeRouter", config.router);
 
-    const token = await ethers.getContractAt("WILDX", config.wild);
-    // const token = await utils.deployAndVerify("WILDX", [config.usdc, config.router]);
+    // const token = await ethers.getContractAt("WILDX", config.wild);
+    const token = await utils.deployAndVerify("WILDX", [config.usdc, config.router]);
 
-    // await token.mint(config.feeAddress, ethers.utils.parseEther("100000000000"));
+    await token.mint(config.feeAddress, ethers.utils.parseEther("1000000000"));
 
     const masterChef = await utils.deployAndVerify("MasterChef", [
         token.address,
@@ -51,9 +51,9 @@ async function main() {
     // const wildDaiPair = await factory.getPair(config.dai, token.address);
     // const wildMimPair = await factory.getPair(config.mim, token.address);
 
-    await masterChef.add(850, wildWethPair, 0, false);
     await masterChef.add(100, token.address, 0, false);
     await masterChef.add(50, config.weth, 400, false);
+    await masterChef.add(850, wildWethPair, 0, false);
     await masterChef.add(0, config.baseLp, 400, false);
 
     console.log({
