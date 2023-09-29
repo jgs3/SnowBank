@@ -31,6 +31,10 @@ contract WILDX is ERC20Burnable, Operator {
 
     uint256 public startTime;
     uint256 public staticTaxRate = 600;
+    uint256 public firstTaxRate = 1200;
+    uint256 public secondTaxRate = 1000;
+    uint256 public thirdTaxRate = 800;
+    uint256 public duration = 1 days;
     uint256 public constant MAX_TAX_RATE = 2000;
 
     // whitelist from and too fee
@@ -133,12 +137,12 @@ contract WILDX is ERC20Burnable, Operator {
     }
 
     function _getStaticTaxRate() private view returns (uint256) {
-        if (block.timestamp - startTime > 0 && block.timestamp - startTime <= 5 minutes) {
-            return uint256(1200);
-        } else if (block.timestamp - startTime > 5 minutes && block.timestamp - startTime <= 10 minutes) {
-            return uint256(1000);
-        } else if (block.timestamp - startTime > 10 minutes && block.timestamp - startTime <= 15 minutes) {
-            return uint256(800);
+        if (block.timestamp - startTime > 0 && block.timestamp - startTime <= duration) {
+            return firstTaxRate;
+        } else if (block.timestamp - startTime > duration && block.timestamp - startTime <= 2 * duration) {
+            return secondTaxRate;
+        } else if (block.timestamp - startTime > 2 * duration && block.timestamp - startTime <= 3 * duration) {
+            return thirdTaxRate;
         } else {
             return staticTaxRate;
         }
@@ -148,7 +152,22 @@ contract WILDX is ERC20Burnable, Operator {
         require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
         staticTaxRate = _taxRate;
     }
-
+    function setSecondTaxRate(uint256 _taxRate) external onlyOperator {
+        require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
+        secondTaxRate = _taxRate;
+    }
+    function setFirstTaxRate(uint256 _taxRate) external onlyOperator {
+        require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
+        firstTaxRate = _taxRate;
+    }
+    function setThirdTaxRate(uint256 _taxRate) external onlyOperator {
+        require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
+        thirdTaxRate = _taxRate;
+    }
+   function setDuration(uint256 _duration) external onlyOperator {
+        require(_duration > 0, "Error: invalid Duration.");
+        duration = _duration;
+    }
     function _setAutomatedMarketMakerPair(address pair, bool value) private {
         require(
             automatedMarketMakerPairs[pair] != value,
