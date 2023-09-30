@@ -6,6 +6,12 @@
 
 
 
+
+
+
+
+
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -16,12 +22,11 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "contracts/libraries/SafeMath8.sol";
 import "contracts/interfaces/IOracle.sol";
-import "contracts/libraries/Operator.sol";
 import "contracts/interfaces/IUniswapV2Factory.sol";
 import "contracts/interfaces/IUniswapV2Pair.sol";
 import "contracts/interfaces/IUniswapV2Router02.sol";
 
-contract WILDX is ERC20Burnable, Operator {
+contract WILDX is ERC20Burnable, Ownable {
     using SafeMath for uint256;
     // immutables
     IUniswapV2Router02 public immutable uniswapV2Router;
@@ -30,10 +35,10 @@ contract WILDX is ERC20Burnable, Operator {
     address public immutable PairUSDC;
 
     uint256 public startTime;
-    uint256 public staticTaxRate = 600;
     uint256 public firstTaxRate = 1200;
     uint256 public secondTaxRate = 1000;
     uint256 public thirdTaxRate = 800;
+    uint256 public staticTaxRate = 600;
     uint256 public duration = 1 days;
     uint256 public constant MAX_TAX_RATE = 2000;
 
@@ -46,7 +51,7 @@ contract WILDX is ERC20Burnable, Operator {
 
     event SwapAndLiquify(uint256 tokensSwapped, uint256 ethReceived, uint256 tokensIntoLiqudity);
 
-    constructor(address _USDC, address _router) ERC20("taxtest.farm", "22WILDX") {
+    constructor(address _USDC, address _router) ERC20("wildxbase.farm", "WILDx") {
         USDC = _USDC;
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(_router);
         uniswapV2Router = _uniswapV2Router;
@@ -65,7 +70,7 @@ contract WILDX is ERC20Burnable, Operator {
     }
 
     // set whitelist
-    function setWhiteList(address _WhiteList) public onlyOperator {
+    function setWhiteList(address _WhiteList) public onlyOwner {
         require(isContract(_WhiteList) == true, "only contracts can be whitelisted");
         require(
             address(uniswapV2Router) != _WhiteList,
@@ -77,7 +82,7 @@ contract WILDX is ERC20Burnable, Operator {
         whitelist[_WhiteList] = true;
     }
 
-    function mint(address to, uint256 amount) external onlyOperator {
+    function mint(address to, uint256 amount) external onlyOwner {
         super._mint(to, amount);
     }
 
@@ -148,26 +153,6 @@ contract WILDX is ERC20Burnable, Operator {
         }
     }
 
-    function setStaticTaxRate(uint256 _taxRate) external onlyOperator {
-        require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
-        staticTaxRate = _taxRate;
-    }
-    function setSecondTaxRate(uint256 _taxRate) external onlyOperator {
-        require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
-        secondTaxRate = _taxRate;
-    }
-    function setFirstTaxRate(uint256 _taxRate) external onlyOperator {
-        require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
-        firstTaxRate = _taxRate;
-    }
-    function setThirdTaxRate(uint256 _taxRate) external onlyOperator {
-        require(_taxRate <= MAX_TAX_RATE, "Error: Max tax rate exceeded.");
-        thirdTaxRate = _taxRate;
-    }
-   function setDuration(uint256 _duration) external onlyOperator {
-        require(_duration > 0, "Error: invalid Duration.");
-        duration = _duration;
-    }
     function _setAutomatedMarketMakerPair(address pair, bool value) private {
         require(
             automatedMarketMakerPairs[pair] != value,

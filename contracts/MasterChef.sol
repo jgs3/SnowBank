@@ -2,7 +2,9 @@
 
 
 
-pragma solidity ^0.8.0;
+
+
+pragma solidity ^0.8.15;
 import "./WILDX.sol";
 
 /**
@@ -337,7 +339,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         uint256 wildxReward = multiplier.mul(wildxPerBlock).mul(pool.allocPoint).div(
             totalAllocPoint
         );
-        wildx.mint(devaddr, wildxReward.div(10));
+        wildx.mint(devaddr, wildxReward.div(5));
         wildx.mint(address(this), wildxReward);
         pool.accWildxPerShare = pool.accWildxPerShare.add(wildxReward.mul(1e12).div(lpSupply));
         pool.lastRewardBlock = block.number;
