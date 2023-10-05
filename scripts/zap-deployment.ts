@@ -36,11 +36,10 @@ async function main() {
         config.router,
         token.address,
         wildWethPair,
-        token.address,
-        wildWethPair,
         config.weth
     );
-    await zapper.setTokensTypes([config.weth, token.address, wildWethPair], [1, 1, 2]);
+    await zapper.setSwapPath(config.weth, token.address, [config.weth, token.address]);
+    await zapper.setSwapPath(token.address, config.weth, [token.address, config.weth]);
 
     console.log({
         // token: token.address,
