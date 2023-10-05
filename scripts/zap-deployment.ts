@@ -25,15 +25,15 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const router = await ethers.getContractAt("PancakeRouter", config.router);
 
-    const token = await ethers.getContractAt("WILDX", config.wild);
+    const token = await ethers.getContractAt("WildToken", config.wild);
     const wildWethPair = await factory.getPair(config.weth, token.address);
 
     const zapper = await utils.deployAndVerify("ZapV3");
 
     await zapper.setCoreValues(
         config.router,
+        config.factory,
         token.address,
         wildWethPair,
         config.weth

@@ -2,17 +2,12 @@
 
 
 
-
-
-
-
-
-
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
 import "./pancakeSwap/interfaces/IPancakeRouter02.sol";
 import "./pancakeSwap/interfaces/IPancakePair.sol";
+import "./pancakeSwap/libraries/TransferHelper.sol";
 import "./interfaces/IBoardroom.sol";
 import "./pancakeSwap/interfaces/IWETH.sol";
 import "./pancakeSwap/interfaces/IWETH.sol";
@@ -368,6 +363,8 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         uint256 _amount,
         address _recipient
     ) internal returns (uint256 amountOut) {
+        require(tokenType[_inputToken] == TokenType.LP, "Error: Invalid token type");
+       
         //Deconstruct target token.
         IPancakePair pair = IPancakePair(_inputToken);
         address tokenA = pair.token0();
@@ -393,11 +390,11 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
                 WETH, //_pathOut
                 address(this) //_recipient
             );
-            IWETH(WETH).deposit{value: amountA}();
-            IERC20(WETH).transfer(_recipient, amountA);
+            IWETH(WETH).withdraw(amountA);
+            TransferHelper.safeTransferETH(_recipient, amountA);
         } else {
-            IWETH(WETH).deposit{value: amountA}();
-            IERC20(WETH).transfer(_recipient, amountA);
+            IWETH(WETH).withdraw(amountA);
+            TransferHelper.safeTransferETH(_recipient, amountA);
         }
 
         //Swap tokenB to target token if required.
@@ -408,11 +405,11 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
                 WETH, //_pathOut
                 address(this) //_recipient
             );
-            IWETH(WETH).deposit{value: amountB}();
-            IERC20(WETH).transfer(_recipient, amountB);
+            IWETH(WETH).withdraw(amountB);
+            TransferHelper.safeTransferETH(_recipient, amountB);
         } else {
-            IWETH(WETH).deposit{value: amountB}();
-            IERC20(WETH).transfer(_recipient, amountB);
+            IWETH(WETH).withdraw(amountB);
+            TransferHelper.safeTransferETH(_recipient, amountB);
         }
 
         //Add amount out.
@@ -591,8 +588,8 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         //Zap into token.
         if (tokenType[_inputToken] == TokenType.ERC20) {
             if (_inputToken == WETH && _targetIsNative == true) {
-                IWETH(WETH).deposit{value: _amount}();
-                IERC20(WETH).transfer(_recipient, _amount);
+                IWETH(WETH).withdraw(_amount);
+                TransferHelper.safeTransferETH(_recipient, _amount);
             } else {
                 amountOut = _zapIntoTokenTaxWrapper(
                     _inputToken,
@@ -622,6 +619,7 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         address _targetToken,
         address _recipient
     ) internal returns (uint256 amountOut) {
+        require(msg.value > _amount, "Insufficiant ETH balance");
         require(tokenType[_targetToken] != TokenType.INVALID, "Error: Invalid token type");
         //Zap into token.
         if (tokenType[_targetToken] == TokenType.ERC20) {
