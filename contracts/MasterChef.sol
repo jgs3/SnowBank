@@ -4,6 +4,8 @@
 
 
 
+
+
 pragma solidity ^0.8.15;
 import "./WILDX.sol";
 
@@ -284,6 +286,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         uint256 _pid,
         uint256 _allocPoint,
         uint16 _depositFeeBP,
+        uint256 _startBlock,
         bool _withUpdate
     ) public onlyOwner {
         require(_depositFeeBP <= 10000, "set: invalid deposit fee basis points");
@@ -293,6 +296,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint);
         poolInfo[_pid].allocPoint = _allocPoint;
         poolInfo[_pid].depositFeeBP = _depositFeeBP;
+        poolInfo[_pid].lastRewardBlock = _startBlock;
     }
 
     // Return reward multiplier over the given _from to _to block.
