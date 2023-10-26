@@ -25,6 +25,18 @@ module.exports = {
                 // If using blockNumber, RPC node should be archive
             },
         },
+        "bsc-testnet": {
+            url: "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+            chainId: 97,
+            gasPrice: 20000000000,
+            accounts: config.mainnetAccounts,
+        },
+        "bsc-mainnet": {
+            url: "https://bsc-dataseed.bnbchain.org/",
+            chainId: 56,
+            gasPrice: 20000000000,
+            accounts: config.mainnetAccounts,
+        },
         "base-mainnet": {
             url: "https://base-mainnet.diamondswap.org/rpc",
             accounts: config.mainnetAccounts,

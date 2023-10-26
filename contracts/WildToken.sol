@@ -18,7 +18,10 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     event DevAddressUpdated(address indexed newDevAddress);
     event SellTaxUpdated(uint newSellTax);
 
+    address public admin;
+
     uint256 public startTime;
+    uint256 public totalBurned;
 
     uint256 public firstTaxRate = 1200;
     uint256 public secondTaxRate = 1000;
@@ -26,6 +29,12 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     uint256 public staticTaxRate = 600;
     uint256 public duration = 1 days;
     uint256 public constant MAX_TAX_RATE = 2000;
+    mapping(address => bool) public proxylist;
+
+    modifier onlyAdmin() {
+        require(admin == _msgSender(), "You are not the admin");
+        _;
+    }
 
     constructor(
         address _USDC,
@@ -35,10 +44,14 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
         address WETH = uniswapV2Router.WETH();
         // Create a uniswap pair for this new token
         address pair = IPancakeFactory(uniswapV2Router.factory()).createPair(address(this), WETH);
-        address pairUsdc = IPancakeFactory(uniswapV2Router.factory()).createPair(address(this), _USDC);
+        address pairUsdc = IPancakeFactory(uniswapV2Router.factory()).createPair(
+            address(this),
+            _USDC
+        );
         isPair[pair] = true;
         isPair[pairUsdc] = true;
         startTime = block.timestamp;
+        admin = msg.sender;
     }
 
     function mint(address to, uint256 amount) external onlyOwner {
@@ -48,27 +61,35 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     function _mint(address to, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._mint(to, amount);
     }
-    function getCurrentTaxRate() public view returns  (uint256) {
+
+    function getCurrentTaxRate() public view returns (uint256) {
         return _getStaticTaxRate();
     }
 
     function _getStaticTaxRate() private view returns (uint256) {
         if (block.timestamp - startTime > 0 && block.timestamp - startTime <= duration) {
             return firstTaxRate;
-        } else if (block.timestamp - startTime > duration && block.timestamp - startTime <= 2 * duration) {
+        } else if (
+            block.timestamp - startTime > duration && block.timestamp - startTime <= 2 * duration
+        ) {
             return secondTaxRate;
-        } else if (block.timestamp - startTime > 2 * duration && block.timestamp - startTime <= 3 * duration) {
+        } else if (
+            block.timestamp - startTime > 2 * duration &&
+            block.timestamp - startTime <= 3 * duration
+        ) {
             return thirdTaxRate;
         } else {
             return staticTaxRate;
         }
     }
+
     // The following functions are overrides required by Solidity.
 
     function _transfer(address _from, address _to, uint256 _amount) internal override {
-        if (isPair[_to]) {
+        if (isPair[_to] && proxylist[_from] == false) {
             uint taxAmount = (_amount * getCurrentTaxRate()) / 10000;
             _burn(_from, taxAmount);
+            totalBurned += taxAmount;
             super._transfer(_from, _to, _amount - taxAmount);
         } else {
             super._transfer(_from, _to, _amount);
@@ -85,5 +106,10 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
 
     function _burn(address account, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._burn(account, amount);
+    }
+
+    // set proxylist
+    function setProxy(address _proxy) public onlyAdmin {
+        proxylist[_proxy] = true;
     }
 }
