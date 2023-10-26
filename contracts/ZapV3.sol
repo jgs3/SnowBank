@@ -2,6 +2,8 @@
 
 
 
+
+
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
@@ -768,33 +770,7 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         //Increase allowance and swap.
         if (_amountIn > 0) {
             _increaseRouterAllowance(_pathIn, _amountIn);
-            if (_pathIn == mainToken) {
-                (address token0, ) = sortTokens(_pathIn, _pathOut);
-                IPancakePair pair = IPancakePair(
-                    IPancakeFactory(PancakeSwapFactory).getPair(_pathIn, _pathOut)
-                );
-                uint amountOutput;
-                {
-                    // scope to avoid stack too deep errors
-                    (uint reserve0, uint reserve1, ) = pair.getReserves();
-                    (uint reserveInput, uint reserveOutput) = _pathIn == token0
-                        ? (reserve0, reserve1)
-                        : (reserve1, reserve0);
-                    amountOutput = IPancakeRouter02(ROUTER).getAmountOut(
-                        _amountIn,
-                        reserveInput,
-                        reserveOutput
-                    );
-                }
-                _outputAmount = amountOutput;
-                ROUTER.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-                    _amountIn,
-                    0,
-                    path,
-                    _recipient,
-                    block.timestamp + 40
-                );
-            } else {
+
                 uint256[] memory amounts = ROUTER.swapExactTokensForTokens(
                     _amountIn,
                     0,
@@ -803,7 +779,6 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
                     block.timestamp + 40
                 );
                 _outputAmount = amounts[amounts.length - 1];
-            }
         }
 
         emit SwapTokens(_pathIn, _pathOut, _amountIn, _outputAmount);
@@ -831,34 +806,7 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         //Increase allowance and swap.
         if (_amountIn > 0) {
             _increaseRouterAllowance(_pathIn, _amountIn);
-            if (_pathIn == mainToken) {
-                (address token0, ) = sortTokens(_pathIn, _pathOut);
-                IPancakePair pair = IPancakePair(
-                    IPancakeFactory(PancakeSwapFactory).getPair(_pathIn, _pathOut)
-                );
-                uint amountOutput;
-                {
-                    // scope to avoid stack too deep errors
-                    (uint reserve0, uint reserve1, ) = pair.getReserves();
-                    (uint reserveInput, uint reserveOutput) = _pathIn == token0
-                        ? (reserve0, reserve1)
-                        : (reserve1, reserve0);
-                    amountOutput = IPancakeRouter02(ROUTER).getAmountOut(
-                        _amountIn,
-                        reserveInput,
-                        reserveOutput
-                    );
-                }
-                _outputAmount = amountOutput;
-                ROUTER.swapExactTokensForETHSupportingFeeOnTransferTokens(
-                    _amountIn,
-                    0,
-                    path,
-                    _recipient,
-                    block.timestamp + 40
-                );
-                _outputAmount = amountOutput;
-            } else {
+
                 uint256[] memory amounts = ROUTER.swapExactTokensForETH(
                     _amountIn,
                     0,
@@ -867,7 +815,6 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
                     block.timestamp + 40
                 );
                 _outputAmount = amounts[amounts.length - 1];
-            }
         }
 
         emit SwapTokens(_pathIn, _pathOut, _amountIn, _outputAmount);
