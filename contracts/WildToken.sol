@@ -6,11 +6,14 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
 import "./pancakeSwap/interfaces/IPancakeRouter02.sol";
 
 contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
+    using SafeMath for uint256;
+    
     mapping(address => bool) public isPair;
     uint public sellTax;
 
@@ -19,16 +22,14 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     event SellTaxUpdated(uint newSellTax);
 
     address public admin;
+    address public deadAddress = 0x000000000000000000000000000000000000dEaD;
 
     uint256 public startTime;
     uint256 public totalBurned;
 
-    uint256 public firstTaxRate = 1200;
-    uint256 public secondTaxRate = 1000;
-    uint256 public thirdTaxRate = 800;
-    uint256 public staticTaxRate = 600;
-    uint256 public duration = 1 days;
-    uint256 public constant MAX_TAX_RATE = 2000;
+    uint256 public staticTaxRate = 800;
+    uint256 public duration = 1 hours;  // 1 days;
+    uint256 public constant MAX_TAX_RATE = 1800;
     mapping(address => bool) public proxylist;
 
     modifier onlyAdmin() {
@@ -37,19 +38,19 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     }
 
     constructor(
-        address _USDC,
+        address _weth,
         address _routerAddress
     ) ERC20("wildbase.farm", "WILDx") ERC20Permit("WILDx") {
         IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
         address WETH = uniswapV2Router.WETH();
         // Create a uniswap pair for this new token
         address pair = IPancakeFactory(uniswapV2Router.factory()).createPair(address(this), WETH);
-        address pairUsdc = IPancakeFactory(uniswapV2Router.factory()).createPair(
+        address pairWeth = IPancakeFactory(uniswapV2Router.factory()).createPair(
             address(this),
-            _USDC
+            _weth
         );
         isPair[pair] = true;
-        isPair[pairUsdc] = true;
+        isPair[pairWeth] = true;
         startTime = block.timestamp;
         admin = msg.sender;
     }
@@ -67,20 +68,17 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     }
 
     function _getStaticTaxRate() private view returns (uint256) {
-        if (block.timestamp - startTime > 0 && block.timestamp - startTime <= duration) {
-            return firstTaxRate;
-        } else if (
-            block.timestamp - startTime > duration && block.timestamp - startTime <= 2 * duration
-        ) {
-            return secondTaxRate;
-        } else if (
-            block.timestamp - startTime > 2 * duration &&
-            block.timestamp - startTime <= 3 * duration
-        ) {
-            return thirdTaxRate;
-        } else {
-            return staticTaxRate;
-        }
+       for (uint256 i = 1; i < 11; i ++) {
+            if (block.timestamp <= startTime.add(duration.mul(i))) {
+                uint256 tax = MAX_TAX_RATE.sub(i.mul(100));
+                if (tax < staticTaxRate) {
+                    return staticTaxRate;
+                } else {
+                    return tax;
+                }
+            }
+       }
+       return staticTaxRate;
     }
 
     // The following functions are overrides required by Solidity.
@@ -105,7 +103,7 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     }
 
     function _burn(address account, uint256 amount) internal override(ERC20, ERC20Votes) {
-        super._burn(account, amount);
+        _transfer(account, deadAddress, amount);
     }
 
     // set proxylist

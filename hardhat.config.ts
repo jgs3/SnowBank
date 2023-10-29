@@ -60,6 +60,8 @@ module.exports = {
         apiKey: {
             "base-goerli": config.apiKeyBase,
             "base-mainnet": config.apiKeyBase,
+            bsc: config.apiKeyBSC,
+            "bsc-mainnet": config.apiKeyBSC,
         },
         customChains: [
             {
