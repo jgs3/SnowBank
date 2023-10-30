@@ -6,19 +6,19 @@ const config = {
     router: "0x8cFe327CEc66d1C090Dd72bd0FF11d690C33a2Eb",
     feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     deployerAddress: "0x600bE5FcB9338BC3938e4790EFBeAaa4F77D6893",
-    wild: "0x88e8BDE43E9996210aEDA7Fe7801faFB4533ac00",
+    wild: "0xEE24730A00943A16A2C4c84055eFbc14a6E51220",
     usdc: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
     wbnb: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-    baseLp: "0xAd48463228573Bfe0E8eF7098A220064eD1e465C",
-    zapper: "0x3bad5BB6a38D4fb0eBB3B21D83b3C9526Dbc414e"
+    baseLp: "0x5a7b2a9cD64177AED1596e7B39d1426a93725611",
+    zapper: "0xE102A51014b3FFb69E7Be5d8d0a13510A0b93b56"
 };
 
 async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    const zapper = await utils.deployAndVerify("ZapV3");
-    // const zapper = await ethers.getContractAt("ZapV3", config.zapper);
+    // const zapper = await utils.deployAndVerify("ZapV3");
+    const zapper = await ethers.getContractAt("ZapV3", config.zapper);
 
     await zapper.setCoreValues(
         config.router,

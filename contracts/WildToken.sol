@@ -64,7 +64,7 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     function _getStaticTaxRate() private view returns (uint256) {
        for (uint256 i = 0; i < 11; i ++) {
             if (block.timestamp <= startTime.add(duration.mul(i))) {
-                uint256 tax = MAX_TAX_RATE.sub(i.mul(100));
+                uint256 tax = MAX_TAX_RATE.sub((i.sub(1)).mul(100));
                 if (tax < staticTaxRate) {
                     return staticTaxRate;
                 } else {
