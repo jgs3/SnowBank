@@ -7,6 +7,8 @@
 
 
 
+
+
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
@@ -83,6 +85,9 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         tokenType[mainTokenLP] = TokenType.LP;
     }
 
+    /*
+     * @notice Fallback for WBNB
+     */
     receive() external payable {}
 
     function sortTokens(
