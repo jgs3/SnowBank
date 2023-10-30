@@ -20,7 +20,7 @@ import "./WildToken.sol";
 // distributed and the community can show to govern itself.
 //
 
-contract MasterChef is Ownable, ReentrancyGuard {
+contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -59,7 +59,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     // Dev address.
     address public devaddr;
     // WILDX tokens created per block.
-    uint256 public wildxPerSecond;
+    uint256 public wildxPerSecond = 1e14;
     // total dev alloc
     uint256 public totalDevAlloc;
     // Bonus muliplier for early wildx makers.
@@ -98,6 +98,15 @@ contract MasterChef is Ownable, ReentrancyGuard {
         feeAddress = _feeAddress1;
         startTime = _startTime;
         admin = msg.sender;
+    }
+
+    function onERC721Received(
+        address operator,
+        address from,
+        uint tokenId,
+        bytes calldata
+    ) external returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 
     function poolLength() external view returns (uint256) {
@@ -140,6 +149,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         bool _withUpdate
     ) public onlyOwner {
         require(_depositFeeBP <= 1000, "set: invalid deposit fee basis points");
+        require(_allocPoint <= 1000, "set: invalid alloc point basis points");
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -171,18 +181,17 @@ contract MasterChef is Ownable, ReentrancyGuard {
                     wildxReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
                 );
             }
+            return
+                user.amount.mul(amountPerNFT).mul(accWildxPerShare).div(1e18).sub(user.rewardDebt);
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
             if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
                 uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-                uint256 wildxReward = multiplier.mul(wildxPerSecond).mul(pool.allocPoint).div(
-                    totalAllocPoint
-                );
+                uint256 wildxReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
                 accWildxPerShare = accWildxPerShare.add(wildxReward.mul(1e18).div(lpSupply));
             }
+            return user.amount.mul(accWildxPerShare).div(1e18).sub(user.rewardDebt);
         }
-
-        return user.amount.mul(accWildxPerShare).div(1e18).sub(user.rewardDebt);
     }
 
     // Update reward variables for all pools. Be careful of gas spending!
@@ -235,7 +244,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         _deposit(_pid, _amount);
     }
 
-    /// @notice Deposit tokens to MasterChef for WILD allocation. 
+    /// @notice Deposit tokens to MasterChef for WILD allocation.
     /// @param _pid pool id to deposit to
     /// @param _amount amount of tokens to deposit. This amount should be approved beforehand
     /// @param _recipient lock period in seconds to lock
@@ -245,16 +254,30 @@ contract MasterChef is Ownable, ReentrancyGuard {
         UserInfo storage user = userInfo[_pid][_recipient];
         updatePool(_pid);
         if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accWildxPerShare).div(1e18).sub(user.rewardDebt);
-            if (pending > 0) {
-                safeWildxTransfer(_recipient, pending);
+            if (pool.isNFTPool) {
+                uint256 pending = user
+                    .amount
+                    .mul(amountPerNFT)
+                    .mul(pool.accWildxPerShare)
+                    .div(1e18)
+                    .sub(user.rewardDebt);
+                if (pending > 0) {
+                    safeWildxTransfer(_recipient, pending);
+                }
+            } else {
+                uint256 pending = user.amount.mul(pool.accWildxPerShare).div(1e18).sub(
+                    user.rewardDebt
+                );
+                if (pending > 0) {
+                    safeWildxTransfer(_recipient, pending);
+                }
             }
         }
         if (_amount > 0) {
             if (pool.isNFTPool) {
                 require(IERC721(pool.lpToken).ownerOf(_amount) == _sender, "Invalid owner");
                 IERC721(pool.lpToken).safeTransferFrom(_sender, address(this), _amount);
-                user.amount = user.amount.add(amountPerNFT);
+                user.amount = user.amount.add(1);
                 user.tokenIds.push(_amount);
             } else {
                 IERC20(pool.lpToken).safeTransferFrom(address(_sender), address(this), _amount);
@@ -279,16 +302,30 @@ contract MasterChef is Ownable, ReentrancyGuard {
         updatePool(_pid);
         address _sender = msg.sender;
         if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accWildxPerShare).div(1e18).sub(user.rewardDebt);
-            if (pending > 0) {
-                safeWildxTransfer(msg.sender, pending);
+            if (pool.isNFTPool) {
+                uint256 pending = user
+                    .amount
+                    .mul(amountPerNFT)
+                    .mul(pool.accWildxPerShare)
+                    .div(1e18)
+                    .sub(user.rewardDebt);
+                if (pending > 0) {
+                    safeWildxTransfer(msg.sender, pending);
+                }
+            } else {
+                uint256 pending = user.amount.mul(pool.accWildxPerShare).div(1e18).sub(
+                    user.rewardDebt
+                );
+                if (pending > 0) {
+                    safeWildxTransfer(msg.sender, pending);
+                }
             }
         }
         if (_amount > 0) {
             if (pool.isNFTPool) {
                 require(IERC721(pool.lpToken).ownerOf(_amount) == _sender, "Invalid owner");
                 IERC721(pool.lpToken).safeTransferFrom(_sender, address(this), _amount);
-                user.amount = user.amount.add(amountPerNFT);
+                user.amount = user.amount.add(1);
                 user.tokenIds.push(_amount);
             } else {
                 IERC20(pool.lpToken).safeTransferFrom(address(_sender), address(this), _amount);
@@ -328,21 +365,34 @@ contract MasterChef is Ownable, ReentrancyGuard {
     function withdraw(uint256 _pid, uint256 _amount) public nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
-        require(user.amount >= _amount, "withdraw: not good");
         updatePool(_pid);
         address _sender = msg.sender;
-        uint256 pending = user.amount.mul(pool.accWildxPerShare).div(1e18).sub(user.rewardDebt);
-        if (pending > 0) {
-            safeWildxTransfer(msg.sender, pending);
+        if (pool.isNFTPool) {
+            uint256 pending = user
+                .amount
+                .mul(amountPerNFT)
+                .mul(pool.accWildxPerShare)
+                .div(1e18)
+                .sub(user.rewardDebt);
+            if (pending > 0) {
+                safeWildxTransfer(msg.sender, pending);
+            }
+        } else {
+            uint256 pending = user.amount.mul(pool.accWildxPerShare).div(1e18).sub(user.rewardDebt);
+            if (pending > 0) {
+                safeWildxTransfer(msg.sender, pending);
+            }
         }
+
         if (_amount > 0) {
             if (pool.isNFTPool) {
                 int index = isValidTokenId(user.tokenIds, _amount);
                 require(index != -1, "Invalid token Id");
                 delete user.tokenIds[uint256(index)];
-                user.amount = user.amount.sub(amountPerNFT);
-                IERC721(pool.lpToken).transferFrom(address(this), _sender, _amount);
+                user.amount = user.amount.sub(1);
+                IERC721(pool.lpToken).safeTransferFrom(address(this), _sender, _amount);
             } else {
+                require(user.amount >= _amount, "withdraw: not good");
                 if (_amount > 0) {
                     user.amount = user.amount.sub(_amount);
                     IERC20(pool.lpToken).safeTransfer(_sender, _amount);
@@ -365,14 +415,11 @@ contract MasterChef is Ownable, ReentrancyGuard {
             uint256[] memory _tokenIds = user.tokenIds;
             for (uint256 i = 0; i < _tokenIds.length; i++) {
                 delete user.tokenIds[i];
-                IERC721(pool.lpToken).transferFrom(address(this), _sender, _tokenIds[i]);
+                IERC721(pool.lpToken).safeTransferFrom(address(this), _sender, _tokenIds[i]);
             }
         } else {
-            if (amount > 0) {
-                user.amount = user.amount.sub(amount);
-                IERC20(pool.lpToken).safeTransfer(_sender, amount);
-            }
-        }        
+            IERC20(pool.lpToken).safeTransfer(_sender, amount);
+        }
         emit EmergencyWithdraw(msg.sender, _pid, amount);
     }
 
@@ -410,5 +457,13 @@ contract MasterChef is Ownable, ReentrancyGuard {
     function setAmountPerNFT(uint256 _newAmount) external onlyFinancialManager {
         require(_newAmount > 0, "invalid amount");
         amountPerNFT = _newAmount;
+    }
+
+    function getAmountPerNFT() public view returns (uint256) {
+        return amountPerNFT;
+    }
+    
+    function getUserStakedNFTs(uint256 _pid, address _user) public view returns (uint256[] memory ) {
+        return  userInfo[_pid][_user].tokenIds;
     }
 }

@@ -38,19 +38,13 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     }
 
     constructor(
-        address _weth,
         address _routerAddress
-    ) ERC20("wildbase.farm", "WILDx") ERC20Permit("WILDx") {
+    ) ERC20("wildbase.farm", "WILDxxx") ERC20Permit("WILDxxx") {
         IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
         address WETH = uniswapV2Router.WETH();
         // Create a uniswap pair for this new token
         address pair = IPancakeFactory(uniswapV2Router.factory()).createPair(address(this), WETH);
-        address pairWeth = IPancakeFactory(uniswapV2Router.factory()).createPair(
-            address(this),
-            _weth
-        );
         isPair[pair] = true;
-        isPair[pairWeth] = true;
         startTime = block.timestamp;
         admin = msg.sender;
     }
@@ -68,7 +62,7 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     }
 
     function _getStaticTaxRate() private view returns (uint256) {
-       for (uint256 i = 1; i < 11; i ++) {
+       for (uint256 i = 0; i < 11; i ++) {
             if (block.timestamp <= startTime.add(duration.mul(i))) {
                 uint256 tax = MAX_TAX_RATE.sub(i.mul(100));
                 if (tax < staticTaxRate) {

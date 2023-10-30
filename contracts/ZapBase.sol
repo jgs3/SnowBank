@@ -3,13 +3,16 @@
 
 
 
+
+
+
+
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
 import "./pancakeSwap/interfaces/IPancakeRouter02.sol";
 import "./pancakeSwap/interfaces/IPancakePair.sol";
 import "./pancakeSwap/libraries/TransferHelper.sol";
-import "./interfaces/IERC20Taxable.sol";
 import "./interfaces/MultipleOperator.sol";
 import "./pancakeSwap/interfaces/IWETH.sol";
 
@@ -19,6 +22,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./WildToken.sol";
 
 // Part: IRewardPool
 
@@ -186,7 +190,7 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
                 (_targetToken != mainToken)
             ) {
                 //Calculate tax variables.
-                uint256 tokenTaxRate = IERC20Taxable(_inputToken).getCurrentTaxRate();
+                uint256 tokenTaxRate = WildToken(_inputToken).getCurrentTaxRate();
                 uint256 taxedAmount = _amount
                     .mul(tokenTaxRate).div(10000);
 
@@ -402,14 +406,6 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         require(tokenType[_inputToken] == TokenType.LP, "Error: Invalid token type");
         require(tokenType[_targetToken] == TokenType.ERC20, "Error: Invalid token type");
 
-        //Restrict usage if not an operator.
-        if (!isOperator()) {
-            require(
-                _targetToken == mainToken,
-                "Error: User is not an operator"
-            );
-        }
-
         //Deconstruct target token.
         IPancakePair pair = IPancakePair(_inputToken);
         address tokenA = pair.token0();
@@ -463,14 +459,6 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
     ) internal returns (uint256 amountOut) {
         require(tokenType[_inputToken] == TokenType.LP, "Error: Invalid token type");
         require(tokenType[_targetToken] == TokenType.LP, "Error: Invalid token type");
-
-        //Restrict usage if not an operator.
-        if (!isOperator()) {
-            require(
-                _targetToken == mainTokenLP,
-                "Error: User is not an operator"
-            );
-        }
 
         //Deconstruct target token.
         IPancakePair pair = IPancakePair(_inputToken);
