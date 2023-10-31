@@ -4,11 +4,6 @@
 
 
 
-
-
-
-
-
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
@@ -24,13 +19,14 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./WildToken.sol";
+import "./ThreeWildToken.sol";
 
 // Part: IRewardPool
 
 interface IRewardPool {
     function depositFor(uint256 _pid, uint256 _amount, address _recipient) external;
 }
+
 // Part: ZapBase
 
 contract ZapBase is MultipleOperator, ReentrancyGuard {
@@ -42,11 +38,10 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
     address public WETH;
     address public mainToken;
     address public mainTokenLP;
-    address public deadAddress = 0x000000000000000000000000000000000000dEaD;
+    address public deadAddress = address(0x000000000000000000000000000000000000dEaD);
 
     IPancakeRouter02 private ROUTER;
     address PancakeSwapFactory;
-
     enum TokenType {
         INVALID,
         ERC20,
@@ -133,8 +128,8 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         uint256 _amountA,
         uint256 _amountB
     ) external {
-        IERC20(_tokenA).safeTransferFrom(msg.sender, address(this), _amountA);
-        IERC20(_tokenB).safeTransferFrom(msg.sender, address(this), _amountB);
+        IERC20(_tokenA).transferFrom(msg.sender, address(this), _amountA);
+        IERC20(_tokenB).transferFrom(msg.sender, address(this), _amountB);
 
         _increaseRouterAllowance(_tokenA, _amountA);
         _increaseRouterAllowance(_tokenB, _amountB);
@@ -157,7 +152,7 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         address _pair,
         uint256 _amount
     ) external {
-        IERC20(_pair).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(_pair).transferFrom(msg.sender, address(this), _amount);
 
         _increaseRouterAllowance(_pair, _amount);
 
@@ -186,32 +181,28 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
     ) internal returns (uint256 amountOut) {
         //Handle token taxes - Only if not zapping into farm.
         //Zap into token.
+        if (
+            (address(_inputToken) == address(mainToken)) &&
+            (address(_targetToken) != address(mainToken)) &&
+            (address(_targetToken) != address(mainTokenLP))
+        ) {
+            //Calculate tax variables.
+            uint256 tokenTaxRate = ThreeWildToken(_inputToken).getCurrentTaxRate();
+            uint256 taxedAmount = _amount.mul(tokenTaxRate).div(10000);
+            //Halve the taxed amount if the target token is an LP token.
+            if (tokenType[_targetToken] == TokenType.LP) {
+                taxedAmount = taxedAmount.div(2);
+            }
+            //Send taxes to Tax Office and handle accordingly.
+            if (taxedAmount > 0) {
+                IERC20(_inputToken).transfer(deadAddress, taxedAmount);
+            }
+            //Amend the input amount.
+            _amount = _amount.sub(taxedAmount);
+        }
         if (_targetIsNative == true) {
             amountOut = _zapIntoETH(_inputToken, _amount, _recipient);
         } else {
-            if (
-                (_recipient != address(this)) &&
-                (_inputToken == mainToken) &&
-                (_targetToken != mainToken)
-            ) {
-                //Calculate tax variables.
-                uint256 tokenTaxRate = WildToken(_inputToken).getCurrentTaxRate();
-                uint256 taxedAmount = _amount
-                    .mul(tokenTaxRate).div(10000);
-
-                //Halve the taxed amount if the target token is an LP token.
-                if (tokenType[_targetToken] == TokenType.LP) {
-                    taxedAmount = taxedAmount.div(2);
-                }
-
-                //Send taxes to Tax Office and handle accordingly.
-                if (taxedAmount > 0) {
-                    IERC20(_inputToken).transfer(deadAddress, taxedAmount);
-                }
-
-                //Amend the input amount.
-                _amount = _amount.sub(taxedAmount);
-            }
             amountOut = _zapIntoToken(_inputToken, _amount, _targetToken, _recipient);
         }
     }
@@ -545,12 +536,12 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         require(tokenType[_targetToken] != TokenType.INVALID, "Error: Invalid token type");
 
         //Transfer token into contract.
-        IERC20(_inputToken).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(_inputToken).transferFrom(msg.sender, address(this), _amount);
 
         //Exit early if no zap required.
         if (_inputToken == _targetToken) {
             if (_recipient != address(this)) {
-                IERC20(_inputToken).safeTransfer(_recipient, _amount);
+                IERC20(_inputToken).transfer(_recipient, _amount);
             }
             return _amount;
         }
@@ -738,15 +729,15 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         if (_amountIn > 0) {
             _increaseRouterAllowance(_pathIn, _amountIn);
 
-                uint256[] memory amounts = ROUTER.swapExactTokensForTokens(
-                    _amountIn,
-                    0,
-                    path,
-                    _recipient,
-                    block.timestamp + 40
-                );
-                _outputAmount = amounts[amounts.length - 1];
-            }
+            uint256[] memory amounts = ROUTER.swapExactTokensForTokens(
+                _amountIn,
+                0,
+                path,
+                _recipient,
+                block.timestamp + 40
+            );
+            _outputAmount = amounts[amounts.length - 1];
+        }
 
         emit SwapTokens(_pathIn, _pathOut, _amountIn, _outputAmount);
     }
@@ -774,14 +765,14 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
         if (_amountIn > 0) {
             _increaseRouterAllowance(_pathIn, _amountIn);
 
-                uint256[] memory amounts = ROUTER.swapExactTokensForETH(
-                    _amountIn,
-                    0,
-                    path,
-                    _recipient,
-                    block.timestamp + 40
-                );
-                _outputAmount = amounts[amounts.length - 1];
+            uint256[] memory amounts = ROUTER.swapExactTokensForETH(
+                _amountIn,
+                0,
+                path,
+                _recipient,
+                block.timestamp + 40
+            );
+            _outputAmount = amounts[amounts.length - 1];
         }
 
         emit SwapTokens(_pathIn, _pathOut, _amountIn, _outputAmount);

@@ -11,9 +11,9 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
 import "./pancakeSwap/interfaces/IPancakeRouter02.sol";
 
-contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
+contract ThreeWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     using SafeMath for uint256;
-    
+
     mapping(address => bool) public isPair;
     uint public sellTax;
 
@@ -28,7 +28,7 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     uint256 public totalBurned;
 
     uint256 public staticTaxRate = 800;
-    uint256 public duration = 1 hours;  // 1 days;
+    uint256 public duration = 1 days; // 1 days;
     uint256 public constant MAX_TAX_RATE = 1800;
     mapping(address => bool) public proxylist;
 
@@ -37,9 +37,7 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
         _;
     }
 
-    constructor(
-        address _routerAddress
-    ) ERC20("wildbase.farm", "WILDxxx") ERC20Permit("WILDxxx") {
+    constructor(address _routerAddress) ERC20("3WiLD.farm", "3WiLD") ERC20Permit("3WiLD") {
         IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
         address WETH = uniswapV2Router.WETH();
         // Create a uniswap pair for this new token
@@ -62,7 +60,7 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     }
 
     function _getStaticTaxRate() private view returns (uint256) {
-       for (uint256 i = 0; i < 11; i ++) {
+        for (uint256 i = 0; i < 11; i++) {
             if (block.timestamp <= startTime.add(duration.mul(i))) {
                 uint256 tax = MAX_TAX_RATE.sub((i.sub(1)).mul(100));
                 if (tax < staticTaxRate) {
@@ -71,8 +69,8 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
                     return tax;
                 }
             }
-       }
-       return staticTaxRate;
+        }
+        return staticTaxRate;
     }
 
     // The following functions are overrides required by Solidity.
@@ -100,8 +98,17 @@ contract WildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
         _transfer(account, deadAddress, amount);
     }
 
+    function isContract(address _addr) private view returns (bool) {
+        uint32 size;
+        assembly {
+            size := extcodesize(_addr)
+        }
+        return (size > 0);
+    }
+
     // set proxylist
     function setProxy(address _proxy) public onlyAdmin {
+        require(isContract(_proxy) == true, "only contracts can be whitelisted");
         proxylist[_proxy] = true;
     }
 }

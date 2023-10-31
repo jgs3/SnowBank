@@ -2,6 +2,8 @@
 
 
 
+
+
 // File: @openzeppelin/contracts/utils/introspection/IERC165.sol
 pragma solidity ^0.8.15;
 
@@ -10,7 +12,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract WILDxNFT is ERC721Enumerable, Ownable {
+contract TreeWiLDNFT is ERC721Enumerable, Ownable {
   using Strings for uint256;
 
   string public baseURI;

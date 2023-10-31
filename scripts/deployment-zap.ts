@@ -4,13 +4,13 @@ const utils = require("../scripts/utils");
 const config = {
     factory: "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73",
     router: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
-    feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
+    feeAddress: "0xD7544E32014F4D0ad77bf5084C8Cbd2321b7a930",
     deployerAddress: '0x600bE5FcB9338BC3938e4790EFBeAaa4F77D6893',
-    wild: "0xA98A6be9dC0AdAe0B06925387cE02BbB53C8edeC",
+    wild: "0xf72A55ADE28437Ef331a34FDa4842835EB8863E9",
     usdc: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
     wbnb: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-    baseLp: "0x2A2747fF5e421DABDd64835892Efab2F6589B063",
-    zapper: "0x81b542A3C09F3ac8bf6114D1eE324eB7a28d54FC"
+    baseLp: "0x4DE35Ce49814b61fF46c7F3DF7dFabd5ea301C8E",
+    zapper: "0x4992d255ff117F8e4c0159bB5b9A7AfAbA6D377c"
 };
 
 async function main() {
