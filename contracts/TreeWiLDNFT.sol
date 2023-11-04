@@ -4,6 +4,12 @@
 
 
 
+
+
+
+
+
+
 // File: @openzeppelin/contracts/utils/introspection/IERC165.sol
 pragma solidity ^0.8.15;
 
@@ -43,8 +49,9 @@ contract TreeWiLDNFT is ERC721Enumerable, Ownable {
     uint256 supply = totalSupply();
     require(!paused);
     require(whitelisted[msg.sender], "User is not whitelisted");
-    require(balanceOf(msg.sender) < maxMintAmountPerUser[msg.sender], "Exceed maximum mint amount");
+    require(maxMintAmountPerUser[msg.sender] > 0, "Exceed maximum mint amount");
     ownerOfToken[supply + 1] = msg.sender;
+    maxMintAmountPerUser[msg.sender] =  maxMintAmountPerUser[msg.sender] - 1;
     _safeMint(msg.sender, supply + 1); 
   }
   
@@ -54,8 +61,9 @@ contract TreeWiLDNFT is ERC721Enumerable, Ownable {
     for (uint256 i = 0; i < _users.length; i ++) {
         uint256 supply = totalSupply();
         require(whitelisted[_users[i]], "User is not whitelisted");
-        require(balanceOf(_users[i]) < maxMintAmountPerUser[_users[i]], "Exceed maximum mint amount");
+        require(maxMintAmountPerUser[_users[i]] > 0, "Exceed maximum mint amount");
         ownerOfToken[supply + 1] = _users[i];
+        maxMintAmountPerUser[msg.sender] =  maxMintAmountPerUser[msg.sender] - 1;
         _safeMint(_users[i], supply + 1); 
     }
   }
@@ -70,7 +78,7 @@ contract TreeWiLDNFT is ERC721Enumerable, Ownable {
             require(whitelisted[to], "Can't send token to any address");
             require(ownerOfToken[tokenId] == from, "invalid token owner");
         }
-        ownerOfToken[tokenId] == to;
+        ownerOfToken[tokenId] = to;
         super._transfer(from, to, tokenId);
     }
 

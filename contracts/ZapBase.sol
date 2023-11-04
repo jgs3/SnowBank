@@ -4,6 +4,8 @@
 
 
 
+
+
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
@@ -11,6 +13,7 @@ import "./pancakeSwap/interfaces/IPancakeRouter02.sol";
 import "./pancakeSwap/interfaces/IPancakePair.sol";
 import "./pancakeSwap/libraries/TransferHelper.sol";
 import "./interfaces/MultipleOperator.sol";
+import "./interfaces/IRewardPool.sol";
 import "./pancakeSwap/interfaces/IWETH.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -20,12 +23,6 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./ThreeWildToken.sol";
-
-// Part: IRewardPool
-
-interface IRewardPool {
-    function depositFor(uint256 _pid, uint256 _amount, address _recipient) external;
-}
 
 // Part: ZapBase
 

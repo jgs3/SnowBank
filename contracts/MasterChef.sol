@@ -14,6 +14,8 @@
 
 
 
+
+
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -473,7 +475,10 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         require(msg.sender == feeAddress, "setFeeAddress1: FORBIDDEN");
         feeAddress = _feeAddress1;
     }
-
+    function setFinancialAccount(address _financial) public {
+        require(msg.sender == admin, "setFinancialAccount: FORBIDDEN");
+        admin = _financial;
+    }
     function updateEmissionRate(uint256 _threeWildPerSecond) public onlyFinancialManager {
         massUpdatePools();
         threeWildPerSecond = _threeWildPerSecond;
