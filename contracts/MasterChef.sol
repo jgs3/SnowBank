@@ -16,6 +16,8 @@
 
 
 
+
+
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -351,7 +353,6 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 }
 
             }
-
         }
         if (_amount > 0) {
             if (pool.isNFTPool) {
