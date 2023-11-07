@@ -37,7 +37,7 @@ contract ThreeWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
         _;
     }
 
-    constructor(address _routerAddress) ERC20("3WiLD.farm", "3WiLD") ERC20Permit("3WiLD") {
+    constructor(address _routerAddress) ERC20("3WiLD.farm(test)", "3WiLD(test)") ERC20Permit("3WiLD(test)") {
         IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
         address WETH = uniswapV2Router.WETH();
         // Create a uniswap pair for this new token

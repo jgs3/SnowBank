@@ -8,9 +8,11 @@ const config = {
     devAddress: "0xD7544E32014F4D0ad77bf5084C8Cbd2321b7a930",
     feeAddress: "0xD7544E32014F4D0ad77bf5084C8Cbd2321b7a930",
     deployerAddress: '0x600bE5FcB9338BC3938e4790EFBeAaa4F77D6893',
-    wild: "0xE9f49BE8C684A823102b33DA0cEa82c6e229F05C",
+    wild: "0xC5BDB5b8f5BDc6eD6251B250C69a20e329d66282",
     usdc: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
     wbnb: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    usdt: "0x55d398326f99059fF775485246999027B3197955",
+    busd: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
     nft: "0xa07eae08eC9d7Ff5a6E1B626aD7F147D87482667",
 };
 
@@ -33,9 +35,14 @@ async function main() {
 
     // adding new pool
     console.log('adding new pool...');
-    await masterChef.add(980, wildWbnbPair, 0, false, false);
+    await masterChef.add(650, wildWbnbPair, 0, false, false);
     await masterChef.add(0, webnbUSDCPair, 400, false, false);
-    await masterChef.add(20, config.nft, 0, false, true);
+    await masterChef.add(50, config.nft, 0, false, true);
+    await masterChef.add(100, config.wild, 300, false, false);
+    await masterChef.add(50, config.wbnb, 500, false, false);
+    await masterChef.add(50, config.busd, 500, false, false);
+    await masterChef.add(50, config.usdt, 500, false, false);
+    await masterChef.add(50, config.usdc, 500, false, false);
 
     console.log('done');
 

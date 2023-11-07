@@ -21,7 +21,7 @@ async function main() {
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const token = await utils.deployAndVerify("ThreeWildToken", [config.router]);
 
-    await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
+    await token.mint(config.deployerAddress, ethers.utils.parseEther("5000"));
 
     const wildWbnbPair = await factory.getPair(config.wbnb, token.address);
     const usdcWethPair = await factory.getPair(config.usdc, config.wbnb);
