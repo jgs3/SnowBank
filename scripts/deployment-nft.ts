@@ -1,17 +1,17 @@
 import { ethers } from "hardhat";
 const utils = require("../scripts/utils");
 
-// const config = {
-//     nft: "0x16e209ee047B0d0fb1829Ef072EA6Ace8e6Ec463",
-// };
+const config = {
+    nft: "0x6f5f41E73BE485ecD4A279a04C5BECc1808309B9",
+};
 
 async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
     const nftContract = await utils.deployAndVerify("ThreeWiLDNFT", [
-        "pWiLD NFT",
-        "pWiLDNFT",
+        "pWiLD NFTx",
+        "pWiLDNFTx",
         "https://wildbase.farm/images/pulse-nfts/",
     ]);
     // const nftContract = await ethers.getContractAt("TreeWiLDNFT", config.nft);

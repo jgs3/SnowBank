@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
 
-const config = require("../config.js");
 const utils = require("./utils");
 
 async function main() {

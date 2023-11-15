@@ -13,18 +13,18 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await utils.deployAndVerify("ThreeWildToken", [config.router]);
+    // const factory = await ethers.getContractAt("PancakeFactory", config.factory);
+    const token = await utils.deployAndVerify("ThreeWildToken", []);
 
-    await token.mint(config.deployerAddress, ethers.utils.parseEther("5000"));
+    // await token.mint(config.deployerAddress, ethers.utils.parseEther("5000"));
 
-    const wildWplsPair = await factory.getPair(config.wpls, token.address);
-    const usdcWethPair = await factory.getPair(config.usdc, config.wpls);
+    // const wildWplsPair = await factory.getPair(config.wpls, token.address);
+    // const usdcWethPair = await factory.getPair(config.usdc, config.wpls);
 
     console.log({
         token: token.address,
-        wildWplsPair: wildWplsPair,
-        usdcWethPair: usdcWethPair,
+        // wildWplsPair: wildWplsPair,
+        // usdcWethPair: usdcWethPair,
     });
 }
 
