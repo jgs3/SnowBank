@@ -20,16 +20,25 @@ module.exports = {
             forking: {
                 enabled: true,
                 url: "https://base-mainnet.diamondswap.org/rpc",
-                //blockNumber: 17130449
-
-                // If using blockNumber, RPC node should be archive
             },
+        },
+        "pulse-mainnet": {
+            url: "https://rpc.pulsechain.com",
+            chainId: 369,
+            accounts: config.mainnetAccounts,
+            gasPrice: 900000 * 1000000000,
+        },
+        "pulse-testnet": {
+            chainId: 943,
+            url: "https://rpc.v4.testnet.pulsechain.com",
+            accounts: config.testnetAccounts,
+            gasPrice: 1000000000,
         },
         "bsc-testnet": {
             url: "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
             chainId: 97,
             gasPrice: 20000000000,
-            accounts: config.mainnetAccounts,
+            accounts: config.testnetAccounts,
         },
         "bsc-mainnet": {
             url: "https://bsc-dataseed.bnbchain.org/",
@@ -40,13 +49,13 @@ module.exports = {
         "base-mainnet": {
             url: "https://base-mainnet.diamondswap.org/rpc",
             accounts: config.mainnetAccounts,
-            // gasPrice: 1000000000,
+            gasPrice: 1000000000,
         },
         // for testnet
         "base-goerli": {
             url: "https://goerli.base.org",
             accounts: config.mainnetAccounts,
-            // gasPrice: 1000000000,
+            gasPrice: 1000000000,
         },
         "base-devnet": {
             url: "https://rpc.vnet.tenderly.co/devnet/base-devnet/b209b556-47d7-4727-a935-aad569bc879c",
@@ -60,8 +69,9 @@ module.exports = {
         apiKey: {
             "base-goerli": config.apiKeyBase,
             "base-mainnet": config.apiKeyBase,
-            bsc: config.apiKeyBSC,
             "bsc-mainnet": config.apiKeyBSC,
+            "pulse-mainnet": '0',
+            "pulse-testnet": "0"
         },
         customChains: [
             {
@@ -88,11 +98,20 @@ module.exports = {
     solidity: {
         compilers: [
             {
+                version: "0.8.7",
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 300,
+                    },
+                },
+            },
+            {
                 version: "0.8.15",
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 200,
+                        runs: 300,
                     },
                 },
             },
@@ -101,7 +120,7 @@ module.exports = {
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 200,
+                        runs: 300,
                     },
                 },
             },
@@ -116,7 +135,7 @@ module.exports = {
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 200,
+                        runs: 300,
                     },
                 },
             },
@@ -125,21 +144,16 @@ module.exports = {
     mocha: {
         timeout: 100000,
     },
-    // docs: https://www.npmjs.com/package/hardhat-contract-sizer
     contractSizer: {
         alphaSort: true,
         runOnCompile: true,
         disambiguatePaths: false,
         except: ["echidna-test/", "test/", "pancakeSwap/", "@openzeppelin/contracts/"],
     },
-    // docs: https://www.npmjs.com/package/hardhat-gas-reporter
     gasReporter: {
-        currency: "USD",
-        token: "BNB", // ETH, BNB, MATIC, AVAX, HT, MOVR
-        coinmarketcap: config.coinmarketcapApi,
-        excludeContracts: ["echidna-test/", "pancakeSwap/", "test/", "@openzeppelin/contracts/"],
+        currency: 'USD',
+        gasPrice: 21
     },
-    // docs: https://www.npmjs.com/package/hardhat-abi-exporter
     abiExporter: {
         path: "./data/abi",
         runOnCompile: true,
@@ -152,8 +166,6 @@ module.exports = {
         overwrite: true,
         runOnCompile: true,
     },
-    // docs: https://www.npmjs.com/package/solidity-docgen
-    // config info: https://github.com/OpenZeppelin/solidity-docgen/blob/master/src/config.ts
     docgen: {
         pages: "items",
         exclude: [

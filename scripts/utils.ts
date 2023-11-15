@@ -11,9 +11,9 @@ export async function deployAndVerify(
     console.log("Deploying Contact...");
     const contract = await Contract.deploy(...args);
     console.log(`${contractName} deployed to: ${contract.address}`);
-
+    console.log('network name:', network.name);
     await contract.deployed();
-    console.log("Done");
+    console.log('done')
 
     const networkName = network.name;
     console.log("Network:", networkName);
@@ -38,6 +38,7 @@ export async function deployAndVerify(
     console.log(`successfully deployed ${contractName}\n\n\n`);
     return contract;
 }
+
 
 export async function verify(address: string, args: Array<any> = []) {
     const networkName = network.name;

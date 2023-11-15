@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
 
-
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -39,7 +38,9 @@ contract ThreeWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
         _;
     }
 
-    constructor(address _routerAddress) ERC20("3WiLD.farm(test)", "3WiLD(test)") ERC20Permit("3WiLD(test)") {
+    constructor(
+        address _routerAddress
+    ) ERC20("pWiLD.farm", "pWiLDx") ERC20Permit("pWiLDx") {
         IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
         address WETH = uniswapV2Router.WETH();
         // Create a uniswap pair for this new token
