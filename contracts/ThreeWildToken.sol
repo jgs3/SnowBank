@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
-contract ThreeWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
+contract PWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     address public admin;
     address public constant deadAddress = 0x000000000000000000000000000000000000dEaD;
     uint256 public startTime;

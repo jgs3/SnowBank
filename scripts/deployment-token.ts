@@ -14,7 +14,7 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     // const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await utils.deployAndVerify("ThreeWildToken", []);
+    const token = await utils.deployAndVerify("PWildToken", []);
 
     // await token.mint(config.deployerAddress, ethers.utils.parseEther("5000"));
 

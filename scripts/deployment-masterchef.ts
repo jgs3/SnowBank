@@ -21,7 +21,7 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await ethers.getContractAt("ThreeWildToken", config.wild);
+    const token = await ethers.getContractAt("PWildToken", config.wild);
 
     const masterChef = await utils.deployAndVerify("MasterChef", [
         token.address,

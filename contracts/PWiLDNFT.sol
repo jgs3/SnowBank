@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract ThreeWiLDNFT is ERC721Enumerable, Ownable {
+contract PWiLDNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
 
     string public baseURI;

@@ -9,7 +9,7 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    const nftContract = await utils.deployAndVerify("ThreeWiLDNFT", [
+    const nftContract = await utils.deployAndVerify("PWiLDNFT", [
         "pWiLD NFTx",
         "pWiLDNFTx",
         "https://wildbase.farm/images/pulse-nfts/",
