@@ -194,9 +194,6 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
                 taxedAmount = taxedAmount.div(2);
             }
             //Send taxes to Tax Office and handle accordingly.
-            if (taxedAmount > 0) {
-                IERC20(_inputToken).transfer(deadAddress, taxedAmount);
-            }
             //Amend the input amount.
             _amount = _amount.sub(taxedAmount);
         }

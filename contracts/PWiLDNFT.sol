@@ -134,13 +134,4 @@ contract PWiLDNFT is ERC721Enumerable, Ownable {
     function removeWhitelistUser(address _user) public onlyOwner {
         whitelisted[_user] = false;
     }
-
-    function withdraw() external onlyOwner {
-        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
-        require(callSuccess, "Call failed");
-    }
-
-    receive() external payable {
-        emit Received(msg.sender, msg.value);
-    }
 }
