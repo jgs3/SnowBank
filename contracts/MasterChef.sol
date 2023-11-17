@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 
-
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -323,24 +322,28 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 }
             }
         }
-        if (pool.isNFTPool) {
-            if (isNFTAll) {
-                uint256[] memory tokenIds = IPWildNFT(pool.lpToken).walletOfOwner(_sender);
-                if (tokenIds.length > 0) {
-                    for (uint256 i = 0; i < tokenIds.length; i++) {
-                        IERC721(pool.lpToken).safeTransferFrom(_sender, address(this), tokenIds[i]);
-                        user.amount = user.amount.add(1);
-                        user.tokenIds.push(tokenIds[i]);
+        if (_amount > 0) {
+            if (pool.isNFTPool) {
+                if (isNFTAll) {
+                    uint256[] memory tokenIds = IPWildNFT(pool.lpToken).walletOfOwner(_sender);
+                    if (tokenIds.length > 0) {
+                        for (uint256 i = 0; i < tokenIds.length; i++) {
+                            IERC721(pool.lpToken).safeTransferFrom(
+                                _sender,
+                                address(this),
+                                tokenIds[i]
+                            );
+                            user.amount = user.amount.add(1);
+                            user.tokenIds.push(tokenIds[i]);
+                        }
                     }
+                } else {
+                    require(IERC721(pool.lpToken).ownerOf(_amount) == _sender, "Invalid owner");
+                    IERC721(pool.lpToken).safeTransferFrom(_sender, address(this), _amount);
+                    user.amount = user.amount.add(1);
+                    user.tokenIds.push(_amount);
                 }
             } else {
-                require(IERC721(pool.lpToken).ownerOf(_amount) == _sender, "Invalid owner");
-                IERC721(pool.lpToken).safeTransferFrom(_sender, address(this), _amount);
-                user.amount = user.amount.add(1);
-                user.tokenIds.push(_amount);
-            }
-        } else {
-            if (_amount > 0) {
                 IERC20(pool.lpToken).safeTransferFrom(address(_sender), address(this), _amount);
                 if (pool.depositFeeBP > 0) {
                     uint256 depositFee = _amount.mul(pool.depositFeeBP).div(10000);
@@ -402,13 +405,15 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 if (isNFTAll) {
                     if (user.tokenIds.length > 0) {
                         for (uint256 i = 0; i < user.tokenIds.length; i++) {
-                            user.amount = user.amount.sub(1);
-                            delete user.tokenIds[i];
-                            IERC721(pool.lpToken).safeTransferFrom(
-                                address(this),
-                                _sender,
-                                user.tokenIds[i]
-                            );
+                            if (user.tokenIds[i] != 0) {
+                                user.amount = user.amount.sub(1);
+                                delete user.tokenIds[i];
+                                IERC721(pool.lpToken).safeTransferFrom(
+                                    address(this),
+                                    _sender,
+                                    user.tokenIds[i]
+                                );
+                            }
                         }
                     }
                 } else {
@@ -441,8 +446,10 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         if (pool.isNFTPool) {
             uint256[] memory _tokenIds = user.tokenIds;
             for (uint256 i = 0; i < _tokenIds.length; i++) {
-                delete user.tokenIds[i];
-                IERC721(pool.lpToken).safeTransferFrom(address(this), _sender, _tokenIds[i]);
+                if (_tokenIds[i] != 0) {
+                    delete user.tokenIds[i];
+                    IERC721(pool.lpToken).safeTransferFrom(address(this), _sender, _tokenIds[i]);
+                }
             }
         } else {
             IERC20(pool.lpToken).safeTransfer(_sender, amount);
