@@ -3,6 +3,7 @@
 
 
 
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -25,6 +26,7 @@ contract PWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
 
     constructor() ERC20("pWiLD.farmx", "pWiLDx") ERC20Permit("pWiLDx") {
         admin = msg.sender;
+        startTime = block.timestamp;
     }
 
     function mint(address to, uint256 amount) external onlyOwner {
@@ -80,5 +82,11 @@ contract PWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
         require(msg.sender == admin, "You are not the admin");
         require(isContract(_proxy), "only contracts can be whitelisted");
         proxylist[_proxy] = true;
+    }
+    
+    function setPair(address _pair) public {
+        require(msg.sender == admin, "You are not the admin");
+        require(isContract(_pair), "only contracts can be whitelisted");
+        isPair[_pair] = true;
     }
 }
