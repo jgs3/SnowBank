@@ -8,7 +8,7 @@ const config = {
     devAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
     feeAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
     deployerAddress: '0x41140Df415A2898937d147842C314c70B3aab82E',
-    wild: "0x2F32211682af0B8d2394C773980ce65b7031A80e",
+    wild: "0xEd4298AB6f9c3D1C26E94E1f5251046bCBeeb770",
     usdc: "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07",
     wpls: "0xA1077a294dDE1B09bB078844df40758a5D0f9a27",
     usdt: "0x0Cb6F5a34ad42ec934882A05265A7d5F59b51A2f",
@@ -31,21 +31,17 @@ async function main() {
     ]);
     // await token.transferOwnership(masterChef.address);
     const wildWplsPair = await factory.getPair(config.wpls, token.address);
-    const webnbUSDCPair = await factory.getPair(config.usdc, config.wpls);
+    const wplsUSDCPair = await factory.getPair(config.usdc, config.wpls);
 
     // adding new pool
     console.log('adding new pool...');
-    await masterChef.add(650, wildWplsPair, 0, false, false);
-    await masterChef.add(0, webnbUSDCPair, 400, false, false);
-    await masterChef.add(50, config.nft, 0, false, true);
-    await masterChef.add(500, config.wild, 300, false, false);
-    await masterChef.add(50, config.wpls, 500, false, false);
-    await masterChef.add(50, config.wpls, 500, false, false);
-    await masterChef.add(50, config.usdt, 500, false, false);
-    await masterChef.add(50, config.usdc, 500, false, false);
+    await masterChef.add(700, wildWplsPair, 0, false, false);
+    await masterChef.add(0, wplsUSDCPair, 900, false, false);
+    await masterChef.add(100, config.wpls, 600, false, false);
     await masterChef.add(50, config.dai, 500, false, false);
-
-
+    await masterChef.add(50, config.usdc, 400, false, false);
+    await masterChef.add(50, config.usdt, 400, false, false);
+    await masterChef.add(50, config.nft, 0, false, true);
     console.log('done');
 
     console.log({
