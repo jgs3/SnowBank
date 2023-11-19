@@ -67,11 +67,11 @@ module.exports = {
     },
     etherscan: {
         apiKey: {
-            "base-goerli": config.apiKeyBase,
-            "base-mainnet": config.apiKeyBase,
-            "bsc-mainnet": config.apiKeyBSC,
+            // "base-goerli": config.apiKeyBase,
+            // "base-mainnet": config.apiKeyBase,
+            // "bsc-mainnet": config.apiKeyBSC,
             "pulse-mainnet": '0',
-            "pulse-testnet": "0"
+            // "pulse-testnet": "0"
         },
         customChains: [
             {
@@ -88,6 +88,14 @@ module.exports = {
                 urls: {
                     apiURL: "https://api.basescan.org/api",
                     browserURL: "https://basescan.org",
+                },
+            },
+            {
+                network: "pulse-mainnet",
+                chainId: 369,
+                urls: {
+                    apiURL: "https://scan.pulsechain.com/api",
+                    browserURL: "https://rpc.pulsechain.com",
                 },
             },
         ],

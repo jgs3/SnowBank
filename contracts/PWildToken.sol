@@ -4,6 +4,7 @@
 
 
 
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -24,7 +25,7 @@ contract PWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     mapping(address => bool) public isPair;
     mapping(address => bool) public proxylist;
 
-    constructor() ERC20("pWiLD.farmx", "pWiLDx") ERC20Permit("pWiLDx") {
+    constructor() ERC20("pWiLD.farm", "pWiLD") ERC20Permit("pWiLD") {
         admin = msg.sender;
         startTime = block.timestamp;
     }

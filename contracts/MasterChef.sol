@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 
+
+
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -324,8 +326,8 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         }
         if (_amount > 0) {
             if (pool.isNFTPool) {
+                uint256[] memory tokenIds = IPWildNFT(pool.lpToken).walletOfOwner(_sender);
                 if (isNFTAll) {
-                    uint256[] memory tokenIds = IPWildNFT(pool.lpToken).walletOfOwner(_sender);
                     if (tokenIds.length > 0) {
                         for (uint256 i = 0; i < tokenIds.length; i++) {
                             IERC721(pool.lpToken).safeTransferFrom(
@@ -338,10 +340,18 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                         }
                     }
                 } else {
-                    require(IERC721(pool.lpToken).ownerOf(_amount) == _sender, "Invalid owner");
-                    IERC721(pool.lpToken).safeTransferFrom(_sender, address(this), _amount);
-                    user.amount = user.amount.add(1);
-                    user.tokenIds.push(_amount);
+                    require(tokenIds.length <= _amount, "Invalid token amount");
+                    if (tokenIds.length > 0) {
+                        for (uint256 i = 0; i < _amount; i++) {
+                            IERC721(pool.lpToken).safeTransferFrom(
+                                _sender,
+                                address(this),
+                                tokenIds[i]
+                            );
+                            user.amount = user.amount.add(1);
+                            user.tokenIds.push(tokenIds[i]);
+                        }
+                    }
                 }
             } else {
                 IERC20(pool.lpToken).safeTransferFrom(address(_sender), address(this), _amount);
@@ -402,26 +412,36 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
 
         if (_amount > 0) {
             if (pool.isNFTPool) {
+                uint256[] memory _tokenIds = user.tokenIds;
                 if (isNFTAll) {
-                    if (user.tokenIds.length > 0) {
-                        for (uint256 i = 0; i < user.tokenIds.length; i++) {
-                            if (user.tokenIds[i] != 0) {
+                    if (_tokenIds.length > 0) {
+                        for (uint256 i = 0; i < _tokenIds.length; i++) {
+                            if (_tokenIds[i] != 0) {
                                 user.amount = user.amount.sub(1);
                                 delete user.tokenIds[i];
                                 IERC721(pool.lpToken).safeTransferFrom(
                                     address(this),
                                     _sender,
-                                    user.tokenIds[i]
+                                    _tokenIds[i]
                                 );
                             }
                         }
                     }
                 } else {
-                    int index = isValidTokenId(user.tokenIds, _amount);
-                    require(index != -1, "Invalid token Id");
-                    delete user.tokenIds[uint256(index)];
-                    user.amount = user.amount.sub(1);
-                    IERC721(pool.lpToken).safeTransferFrom(address(this), _sender, _amount);
+                    require(_tokenIds.length <= _amount, "Invalid token amount");
+                    if (_tokenIds.length > 0) {
+                        for (uint256 i = 0; i < _amount; i++) {
+                            if (_tokenIds[i] != 0) {
+                                user.amount = user.amount.sub(1);
+                                delete user.tokenIds[i];
+                                IERC721(pool.lpToken).safeTransferFrom(
+                                    address(this),
+                                    _sender,
+                                    _tokenIds[i]
+                                );
+                            }
+                        }
+                    }
                 }
             } else {
                 require(user.amount >= _amount, "withdraw: not good");

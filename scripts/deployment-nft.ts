@@ -10,11 +10,11 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const nftContract = await utils.deployAndVerify("PWiLDNFT", [
-        "pWiLD NFTx",
-        "pWiLDNFTx",
+        "pWiLD NFT",
+        "pWiLDNFT",
         "https://wildbase.farm/images/pulse-nfts/",
     ]);
-    // const nftContract = await ethers.getContractAt("TreeWiLDNFT", config.nft);
+    // const nftContract = await ethers.getContractAt("PWiLDNFT", config.nft);
     // const addresses = [
     //     // "0x7c16Bb273156b75F02123f3ee156e54813b036d6",
     //     // "0x8F1D8C788E15c1E8de99DcE8E2d23a3a513fc62a",
@@ -54,7 +54,7 @@ async function main() {
     // ];
 
     const addresses = [
-        "0x8e5D12250299007801049597875605c304Edf058"
+        "0x41140Df415A2898937d147842C314c70B3aab82E"
         // "0x4dc8EfbFDC9213e13e22DDB22fb563ee5f4cF4C2"
         // "0x4B12435D43010972915cbf7dAafe0d1785160313",
         // "0x4B12435D43010972915cbf7dAafe0d1785160313"
@@ -78,7 +78,7 @@ async function main() {
 ]
 
 const amounts = [
-    1
+    3
     // 1,
     // 2,
     // 2,
