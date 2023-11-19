@@ -11,7 +11,7 @@ const config = {
     weth: "0x4DB5a66E937A9F4473fA95b1cAF1d1E1D62E29EA",
     wpls: "0xA1077a294dDE1B09bB078844df40758a5D0f9a27",
     zapper: "0xd88927A667e9883e101CEf509A8Da100F00c71fd",
-    masterchef: "0x2Dd7E80390eEe49EA15c044ae81D24Edd83E557f",
+    masterchef: "0x1eE9FF255c17c364Cea9a8bbbEc1F2720B20447f",
     nft:"0xE6f089D0403a39D21DC0892b42bb8B2F249CeDe3",
     baseLp:"0xa3017359377db29e3a54f170a8e7cf899a409e25",
 };
@@ -28,9 +28,9 @@ async function main() {
 
     // await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
 
-    console.log("setting zapper to whitelist...");
-    await token.setProxy(config.zapper);
-    console.log("done");
+    // console.log("setting zapper to whitelist...");
+    // await token.setProxy(config.zapper);
+    // console.log("done");
 
     // console.log("setting lp contract to pair...");
     // await token.setPair(config.baseLp);
@@ -49,15 +49,15 @@ async function main() {
     // console.log("done");
 
     // setWhiteListWithMaximumAmount
-    console.log("setWhiteListWithMaximumAmount in nft...");
-    await nft.setWhiteListWithMaximumAmount(config.feeAddress, 3);
-    console.log("done");
+    // console.log("setWhiteListWithMaximumAmount in nft...");
+    // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 3);
+    // console.log("done");
 
-    console.log("mint nft...");
-    await nft.mint();
-    await nft.mint();
-    await nft.mint();
-    console.log("done");
+    // console.log("mint nft...");
+    // await nft.mint();
+    // await nft.mint();
+    // await nft.mint();
+    // console.log("done");
     // console.log("transferring ownership of masterchef...");
     // await masterchef.transferOwnership(config.feeAddress);
     // console.log("done");

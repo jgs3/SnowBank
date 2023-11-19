@@ -2,6 +2,7 @@
 
 
 
+
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -340,7 +341,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                         }
                     }
                 } else {
-                    require(tokenIds.length <= _amount, "Invalid token amount");
+                    require(tokenIds.length >= _amount, "Invalid token amount");
                     if (tokenIds.length > 0) {
                         for (uint256 i = 0; i < _amount; i++) {
                             IERC721(pool.lpToken).safeTransferFrom(
@@ -428,7 +429,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                         }
                     }
                 } else {
-                    require(_tokenIds.length <= _amount, "Invalid token amount");
+                    require(_tokenIds.length >= _amount, "Invalid token amount");
                     if (_tokenIds.length > 0) {
                         for (uint256 i = 0; i < _amount; i++) {
                             if (_tokenIds[i] != 0) {
