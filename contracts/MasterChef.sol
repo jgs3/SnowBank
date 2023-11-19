@@ -2,7 +2,6 @@
 
 
 
-
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -378,16 +377,6 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         }
     }
 
-    // check user's nft token id is valid
-    function isValidTokenId(uint256[] memory arr, uint256 _tokenId) internal view returns (int) {
-        for (int i = 0; i < int(arr.length); i++) {
-            if (arr[uint256(i)] == _tokenId) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     // Withdraw LP tokens from MasterChef.
     function withdraw(uint256 _pid, uint256 _amount, bool isNFTAll) public nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
@@ -416,31 +405,32 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 uint256[] memory _tokenIds = user.tokenIds;
                 if (isNFTAll) {
                     if (_tokenIds.length > 0) {
+                        uint256[] memory empyArr;
+                        user.tokenIds = empyArr;
                         for (uint256 i = 0; i < _tokenIds.length; i++) {
-                            if (_tokenIds[i] != 0) {
-                                user.amount = user.amount.sub(1);
-                                delete user.tokenIds[i];
-                                IERC721(pool.lpToken).safeTransferFrom(
-                                    address(this),
-                                    _sender,
-                                    _tokenIds[i]
-                                );
-                            }
+                            user.amount = user.amount.sub(1);
+                            IERC721(pool.lpToken).safeTransferFrom(
+                                address(this),
+                                _sender,
+                                _tokenIds[i]
+                            );
                         }
                     }
                 } else {
                     require(_tokenIds.length >= _amount, "Invalid token amount");
                     if (_tokenIds.length > 0) {
+                        uint256[] memory newArr = new uint256[](_tokenIds.length - _amount);
+                        for (uint256 i = _amount; i < _tokenIds.length; i++) {
+                            newArr[i - _amount] = _tokenIds[i];
+                        }
+                        user.tokenIds = newArr;
                         for (uint256 i = 0; i < _amount; i++) {
-                            if (_tokenIds[i] != 0) {
-                                user.amount = user.amount.sub(1);
-                                delete user.tokenIds[i];
-                                IERC721(pool.lpToken).safeTransferFrom(
-                                    address(this),
-                                    _sender,
-                                    _tokenIds[i]
-                                );
-                            }
+                            user.amount = user.amount.sub(1);
+                            IERC721(pool.lpToken).safeTransferFrom(
+                                address(this),
+                                _sender,
+                                _tokenIds[i]
+                            );
                         }
                     }
                 }
@@ -466,11 +456,10 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         user.rewardDebt = 0;
         if (pool.isNFTPool) {
             uint256[] memory _tokenIds = user.tokenIds;
+            uint256[] memory empyArr;
+            user.tokenIds = empyArr;
             for (uint256 i = 0; i < _tokenIds.length; i++) {
-                if (_tokenIds[i] != 0) {
-                    delete user.tokenIds[i];
-                    IERC721(pool.lpToken).safeTransferFrom(address(this), _sender, _tokenIds[i]);
-                }
+                IERC721(pool.lpToken).safeTransferFrom(address(this), _sender, _tokenIds[i]);
             }
         } else {
             IERC20(pool.lpToken).safeTransfer(_sender, amount);
