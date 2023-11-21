@@ -1,20 +1,6 @@
 import { ethers } from "hardhat";
 const utils = require("../scripts/utils");
-
-const config = {
-    factory: "0x29eA7545DEf87022BAdc76323F373EA1e707C523",
-    router: "0x165C3410fC91EF562C50559f7d2289fEbed552d9",
-    startTime: 1698733996, //Date and time (GMT): Thursday, September 7, 2023 2:22:25 PM
-    devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
-    feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
-    deployerAddress: '0x41140Df415A2898937d147842C314c70B3aab82E',
-    wild: "0xFeD150f75A70c519DB81ae02F0a9eC264D094eF4",
-    usdc: "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07",
-    wpls: "0xA1077a294dDE1B09bB078844df40758a5D0f9a27",
-    usdt: "0x0Cb6F5a34ad42ec934882A05265A7d5F59b51A2f",
-    dai: "0xefD766cCb38EaF1dfd701853BFCe31359239F305",
-    nft: "0xB258c44E1544e7d91AbC9A617252Ee2c94D8d542",
-};
+const { config } = require("../scripts/config");
 
 async function main() {
     const [deployer] = await ethers.getSigners();
@@ -30,17 +16,17 @@ async function main() {
         config.startTime,
     ]);
     // await token.transferOwnership(masterChef.address);
-    const wildWplsPair = await factory.getPair(config.wpls, token.address);
-    const wplsUSDCPair = await factory.getPair(config.usdc, config.wpls);
+    const wildwethPair = await factory.getPair(config.weth, token.address);
+    const wethUSDCPair = await factory.getPair(config.usdc, config.weth);
 
     // adding new pool
     console.log('adding new pool...');
-    await masterChef.add(700, wildWplsPair, 0, false, false);
-    await masterChef.add(0, wplsUSDCPair, 900, false, false);
-    await masterChef.add(100, config.wpls, 600, false, false);
+    await masterChef.add(700, wildwethPair, 0, false, false);
+    await masterChef.add(0, wethUSDCPair, 900, false, false);
+    await masterChef.add(100, config.weth, 600, false, false);
     await masterChef.add(50, config.dai, 500, false, false);
     await masterChef.add(50, config.usdc, 400, false, false);
-    await masterChef.add(50, config.usdt, 400, false, false);
+    await masterChef.add(50, config.mim, 400, false, false);
     await masterChef.add(50, config.nft, 0, false, true);
     console.log('done');
 

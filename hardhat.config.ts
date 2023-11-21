@@ -67,11 +67,11 @@ module.exports = {
     },
     etherscan: {
         apiKey: {
-            // "base-goerli": config.apiKeyBase,
-            // "base-mainnet": config.apiKeyBase,
-            // "bsc-mainnet": config.apiKeyBSC,
+            "base-goerli": config.apiKeyBase,
+            "base-mainnet": config.apiKeyBase,
+            "bsc-mainnet": config.apiKeyBSC,
             "pulse-mainnet": '0',
-            // "pulse-testnet": "0"
+            "pulse-testnet": "0"
         },
         customChains: [
             {
