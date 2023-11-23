@@ -6,14 +6,14 @@ const config = {
     router: "0x165C3410fC91EF562C50559f7d2289fEbed552d9",
     feeAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
     deployerAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
-    wild: "0x058698C5Fd5925dA0cE03D3B1803C0146e734fF8",
+    wild: "0xa32Ba2Bb68753c5bAbd0c110Ba3FF7E688018917",
     usdc: "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07",
     weth: "0x4DB5a66E937A9F4473fA95b1cAF1d1E1D62E29EA",
     wpls: "0xA1077a294dDE1B09bB078844df40758a5D0f9a27",
-    zapper: "0xd88927A667e9883e101CEf509A8Da100F00c71fd",
-    masterchef: "0x769db848ca1578Eb55B6de7A29fd41C80c0166A7",
-    nft:"0xE6f089D0403a39D21DC0892b42bb8B2F249CeDe3",
-    baseLp:"0x9414e84c2b53359ae7e913d5e2ac143fa65386aa",
+    zapper: "0x556BEf0Ee5CB5D3d46398a6042D81b622118059E",
+    masterchef: "0xA24299910CE35CB4CF0133f7b612E503C2cA9e31",
+    nft:"0xE7a51374E42cb2D0AE1c3cf3399710a9DCd5A0A5",
+    baseLp:"0xA24299910CE35CB4CF0133f7b612E503C2cA9e31",
 };
 
 async function main() {
@@ -48,16 +48,16 @@ async function main() {
     await masterchef.updateEmissionRate("11000000000000000");
     console.log("done");
 
-    // // setWhiteListWithMaximumAmount
-    // console.log("setWhiteListWithMaximumAmount in nft...");
-    // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 3);
-    // console.log("done");
+    // setWhiteListWithMaximumAmount
+    console.log("setWhiteListWithMaximumAmount in nft...");
+    await nft.setWhiteListWithMaximumAmount(config.feeAddress, 3);
+    console.log("done");
 
-    // console.log("mint nft...");
-    // await nft.mint();
-    // await nft.mint();
-    // await nft.mint();
-    // console.log("done");
+    console.log("mint nft...");
+    await nft.mint();
+    await nft.mint();
+    await nft.mint();
+    console.log("done");
     // console.log("transferring ownership of masterchef...");
     // await masterchef.transferOwnership(config.feeAddress);
     // console.log("done");
