@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 
-
-
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -12,6 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import "./PWildToken.sol";
+import "./ZapBase.sol";
 
 interface IPWildNFT {
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
@@ -166,8 +165,14 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         return _toTime.sub(_fromTime).mul(pWildPerSecond);
     }
 
+    // Deposit LP tokens to MasterChef for PWILD allocation.
+    function pendingPWild(uint256 _pid, address _user) public view returns (uint256) {
+        uint256 pending = _pendingPWild(_pid, _user);
+        return pending;
+    }
+
     // View function to see pending PWILDs on frontend.
-    function pendingPWild(uint256 _pid, address _user) external view returns (uint256) {
+    function _pendingPWild(uint256 _pid, address _user) internal view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
         uint256 accPWildPerShare = pool.accPWildPerShare;
@@ -475,6 +480,23 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         } else {
             pWild.transfer(_to, _amount);
         }
+    }
+
+    function compound(uint256 _pid, address _user) public nonReentrant {
+        uint256 pending = pendingPWild(_pid, _user);
+        PoolInfo storage pool = poolInfo[_pid];
+        //Zap into token.
+        uint256 amountOut = _universalZap(
+            pWild, //_inputToken
+            pending, //_amount
+            pool.lpToken, //_targetToken
+            address(this), //_recipient
+            false
+        );
+
+        //Stake in farm.
+        IERC20(pool.lpToken).safeIncreaseAllowance(address(this), amountOut);
+        depositFor(_pid, amountOut, msg.sender);
     }
 
     // Update dev address by the previous dev.
