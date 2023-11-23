@@ -2,7 +2,6 @@
 
 
 
-
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -13,7 +12,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import "./PWildToken.sol";
-import "./ZapBase.sol";
 
 interface IPWildNFT {
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
@@ -26,7 +24,7 @@ interface IPWildNFT {
 // distributed and the community can show to govern itself.
 //
 
-contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard, ZapBase {
+contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -64,8 +62,6 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard, ZapBase {
 
     // The PWILD TOKEN!
     PWildToken public pWild;
-    // The PWILD address
-    address public pWildAddr;
     // Dev address.
     address public devaddr;
     // PWILD tokens created per block.
@@ -97,7 +93,6 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard, ZapBase {
     }
 
     constructor(address _pWild, address _devaddr, address _feeAddress1, uint256 _startTime) {
-        pWildAddr = _pWild;
         pWild = PWildToken(_pWild);
         devaddr = _devaddr;
         feeAddress = _feeAddress1;
@@ -171,13 +166,8 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard, ZapBase {
         return _toTime.sub(_fromTime).mul(pWildPerSecond);
     }
 
-    function pendingPWild(uint256 _pid, address _user) external view returns (uint256) {
-        uint256 pending = _pendingPWild(_pid, _user);
-        return pending;
-    }
-
     // View function to see pending PWILDs on frontend.
-    function _pendingPWild(uint256 _pid, address _user) internal view returns (uint256) {
+    function pendingPWild(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
         uint256 accPWildPerShare = pool.accPWildPerShare;
@@ -253,16 +243,11 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard, ZapBase {
         _deposit(_pid, _amount, isNFTAll);
     }
 
-        // Deposit LP tokens to MasterChef for PWILD allocation.
-    function depositFor(uint256 _pid, uint256 _amount, address _recipient) external nonReentrant {
-        _depositFor(_pid, _amount, _recipient);
-    }
-
     /// @notice Deposit tokens to MasterChef for WILD allocation.
     /// @param _pid pool id to deposit to
     /// @param _amount amount of tokens to deposit. This amount should be approved beforehand
     /// @param _recipient lock period in seconds to lock
-    function _depositFor(uint256 _pid, uint256 _amount, address _recipient) internal {
+    function depositFor(uint256 _pid, uint256 _amount, address _recipient) external nonReentrant {
         address _sender = msg.sender;
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_recipient];
@@ -490,23 +475,6 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard, ZapBase {
         } else {
             pWild.transfer(_to, _amount);
         }
-    }
-
-    function compound(uint256 _pid, address _user) public nonReentrant {
-        uint256 pending = _pendingPWild(_pid, _user);
-        PoolInfo storage pool = poolInfo[_pid];
-        //Zap into token.
-        uint256 amountOut = _universalZap(
-            pWildAddr, //_inputToken
-            pending, //_amount
-            pool.lpToken, //_targetToken
-            address(this), //_recipient
-            false
-        );
-
-        //Stake in farm.
-        IERC20(pool.lpToken).safeIncreaseAllowance(address(this), amountOut);
-        _depositFor(_pid, amountOut, msg.sender);
     }
 
     // Update dev address by the previous dev.
