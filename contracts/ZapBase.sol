@@ -5,12 +5,6 @@
 
 
 
-
-
-
-
-
-
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
@@ -522,6 +516,36 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
                 _recipient //_recipient.
             );
         }
+    }
+
+    function universalZapForCompound(
+        address _inputToken,
+        uint256 _amount,
+        address _targetToken,
+        address _recipient
+    ) external returns (uint256 amountOut) {
+        require(tokenType[_targetToken] != TokenType.INVALID, "Error: Invalid token type");
+        //Transfer token into contract.
+        
+        //Exit early if no zap required.
+        if (_inputToken == _targetToken) {
+            if (_recipient != address(this)) {
+                IERC20(_inputToken).transfer(_recipient, _amount);
+            }
+            return _amount;
+        }
+
+        IERC20(_inputToken).transferFrom(msg.sender, address(this), _amount);
+        amountOut = _zapIntoTokenTaxWrapper(
+            _inputToken,
+            _amount,
+            _targetToken,
+            false,
+            _recipient
+        );
+        //Truncate to target token balance.
+        uint256 targetTokenBalance = IERC20(_targetToken).balanceOf(_recipient);
+        amountOut = amountOut > targetTokenBalance ? targetTokenBalance : amountOut;
     }
 
     function _universalZap(

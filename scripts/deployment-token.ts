@@ -16,7 +16,7 @@ async function main() {
     // const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const token = await utils.deployAndVerify("PWildToken", []);
 
-    await token.mint(config.deployerAddress, ethers.utils.parseEther("5000"));
+    await token.mint(config.deployerAddress, ethers.utils.parseEther("500010000"));
 
     // const wildWplsPair = await factory.getPair(config.wpls, token.address);
     // const usdcWethPair = await factory.getPair(config.usdc, config.wpls);

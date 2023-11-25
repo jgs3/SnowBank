@@ -1,18 +1,5 @@
 import { ethers } from "hardhat";
-
-const config = {
-    factory: "0x29eA7545DEf87022BAdc76323F373EA1e707C523",
-    router: "0x165C3410fC91EF562C50559f7d2289fEbed552d9",
-    feeAddress: "0xD7544E32014F4D0ad77bf5084C8Cbd2321b7a930",
-    deployerAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
-    wild: "0xa32Ba2Bb68753c5bAbd0c110Ba3FF7E688018917",
-    usdc: "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07",
-    usdt: "0x0Cb6F5a34ad42ec934882A05265A7d5F59b51A2f",
-    wpls: "0xA1077a294dDE1B09bB078844df40758a5D0f9a27",
-    baseLp: "0x371e664e45672e3ab21c4755fff19973747fc31e",
-    dai: "0xefD766cCb38EaF1dfd701853BFCe31359239F305",
-    zapper: "0x556BEf0Ee5CB5D3d46398a6042D81b622118059E"
-};
+const { config } = require("../scripts/config");
 
 async function main() {
     const [deployer] = await ethers.getSigners();

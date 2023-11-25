@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 
+
+
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -13,6 +15,15 @@ import "./PWildToken.sol";
 
 interface IPWildNFT {
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
+}
+
+interface IZap {
+    function universalZapForCompound(
+        address _inputToken,
+        uint256 _amount,
+        address _targetToken,
+        address _recipient
+    ) external returns (uint256 amountOut);
 }
 
 // MasterChef is the master of PWILD. He can make PWILD and he is a fair guy.
@@ -60,6 +71,10 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
 
     // The PWILD TOKEN!
     PWildToken public pWild;
+    // The PWILD Address
+    address public pWildAddr;
+    // Zap address
+    address public zapAddr;
     // Dev address.
     address public devaddr;
     // PWILD tokens created per block.
@@ -90,11 +105,19 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         _;
     }
 
-    constructor(address _pWild, address _devaddr, address _feeAddress1, uint256 _startTime) {
+    constructor(
+        address _pWild,
+        address _devaddr,
+        address _feeAddress1,
+        address _zapAddr,
+        uint256 _startTime
+    ) {
         pWild = PWildToken(_pWild);
         devaddr = _devaddr;
         feeAddress = _feeAddress1;
         startTime = _startTime;
+        pWildAddr = _pWild;
+        zapAddr = _zapAddr;
     }
 
     function onERC721Received(
@@ -216,9 +239,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
             PWildToken(pWild).mint(devaddr, pWildReward.div(5));
             PWildToken(pWild).mint(address(this), pWildReward);
             totalDevAlloc += pWildReward.div(5);
-            pool.accPWildPerShare = pool.accPWildPerShare.add(
-                pWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
-            );
+            pool.accPWildPerShare = pool.accPWildPerShare.add(pWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT)));
             pool.lastRewardTime = block.timestamp;
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
@@ -364,7 +385,11 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 }
             }
         }
-        user.rewardDebt = user.amount.mul(pool.accPWildPerShare).div(1e18);
+        if (pool.isNFTPool) {
+            user.rewardDebt = user.amount.mul(amountPerNFT).mul(pool.accPWildPerShare).div(1e18);
+        } else {
+            user.rewardDebt = user.amount.mul(pool.accPWildPerShare).div(1e18);
+        }
         emit Deposit(msg.sender, _pid, _amount);
     }
 
@@ -472,6 +497,50 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
             pWild.transfer(_to, pWildBal);
         } else {
             pWild.transfer(_to, _amount);
+        }
+    }
+
+    function compound(uint256 _pid) public nonReentrant {
+        PoolInfo storage pool = poolInfo[_pid];
+        UserInfo storage user = userInfo[_pid][msg.sender];
+        uint256 amountOut = 0;
+        updatePool(_pid);
+        if (user.amount > 0) {
+            uint256 pending = user.amount.mul(pool.accPWildPerShare).div(1e18).sub(user.rewardDebt);
+            uint256 pWildBal = pWild.balanceOf(address(this));
+
+            if (user.amount > 0) {
+                if (pending > 0) {
+                    if (pending > pWildBal) {
+                        IERC20(pWildAddr).safeIncreaseAllowance(address(zapAddr), pWildBal);
+                        amountOut = IZap(zapAddr).universalZapForCompound(
+                            pWildAddr, //_inputToken
+                            pWildBal, //_amount
+                            pool.lpToken, //_targetToken
+                            address(this) //_recipient
+                        );
+                    } else {
+                        IERC20(pWildAddr).safeIncreaseAllowance(address(zapAddr), pending);
+                        amountOut = IZap(zapAddr).universalZapForCompound(
+                            pWildAddr, //_inputToken
+                            pending, //_amount
+                            pool.lpToken, //_targetToken
+                            address(this) //_recipient
+                        );
+                    }
+                }
+            }
+
+            if (amountOut > 0) {
+                if (pool.depositFeeBP > 0) {
+                    uint256 depositFee = amountOut.mul(pool.depositFeeBP).div(10000);
+                    IERC20(pool.lpToken).safeTransfer(feeAddress, depositFee);
+                    user.amount = user.amount.add(amountOut).sub(depositFee);
+                } else {
+                    user.amount = user.amount.add(amountOut);
+                }
+            }
+            user.rewardDebt = user.amount.mul(pool.accPWildPerShare).div(1e18);
         }
     }
 

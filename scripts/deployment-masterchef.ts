@@ -1,20 +1,7 @@
 import { ethers } from "hardhat";
 const utils = require("../scripts/utils");
+const { config } = require("../scripts/config")
 
-const config = {
-    factory: "0x29eA7545DEf87022BAdc76323F373EA1e707C523",
-    router: "0x165C3410fC91EF562C50559f7d2289fEbed552d9",
-    startTime: 1698733996, //Date and time (GMT): Thursday, September 7, 2023 2:22:25 PM
-    devAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
-    feeAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
-    deployerAddress: '0x41140Df415A2898937d147842C314c70B3aab82E',
-    wild: "0xa32Ba2Bb68753c5bAbd0c110Ba3FF7E688018917",
-    usdc: "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07",
-    wpls: "0xA1077a294dDE1B09bB078844df40758a5D0f9a27",
-    usdt: "0x0Cb6F5a34ad42ec934882A05265A7d5F59b51A2f",
-    dai: "0xefD766cCb38EaF1dfd701853BFCe31359239F305",
-    nft: "0xE7a51374E42cb2D0AE1c3cf3399710a9DCd5A0A5",
-};
 
 async function main() {
     const [deployer] = await ethers.getSigners();
@@ -27,6 +14,7 @@ async function main() {
         token.address,
         config.feeAddress, //dev address
         config.feeAddress, //fee address
+        config.zapper,
         config.startTime,
     ]);
     // await token.transferOwnership(masterChef.address);
