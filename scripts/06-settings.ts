@@ -9,14 +9,14 @@ async function main() {
     // const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const token = await ethers.getContractAt("BWildToken", config.wild);
     const zapper = await ethers.getContractAt("ZapV3", config.zap);
-    const nft = await ethers.getContractAt("PWiLDNFT", config.nft);
+    const nft = await ethers.getContractAt("BWiLDNFT", config.nft);
     const masterchef = await ethers.getContractAt("MasterChef", config.masterchef);
 
     // await token.mint(config.feeAddress, ethers.utils.parseEther("5000000"));
 
-    // console.log("setting zapper to whitelist...");
-    // await token.setProxy(config.zap);
-    // console.log("done");
+    console.log("setting zapper to whitelist...");
+    await token.setProxy(config.zap);
+    console.log("done");
 
     // console.log("setting lp contract to pair...");
     // await token.setPair(config.baseLp);
@@ -26,10 +26,10 @@ async function main() {
     // await token.transferOwnership(config.masterchef);
     // console.log("done");
 
-    //whitelistUser
-    // console.log("setting masterchef to whitelist in nft...");
-    // await nft.whitelistUser(config.masterchef);
-    // console.log("done");
+    // whitelistUser
+    console.log("setting masterchef to whitelist in nft...");
+    await nft.whitelistUser(config.masterchef);
+    console.log("done");
 
     // console.log("updating emission...");
     // await masterchef.updateEmissionRate("11000000000000000");

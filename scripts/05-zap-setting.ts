@@ -16,6 +16,12 @@ async function main() {
         config.weth
     );
 
+    // weth - wild
+    console.log("set swap path for weth-wild");
+    await zapper.setSwapPath(config.wild, config.weth, [config.wild, config.weth]);
+    await zapper.setSwapPath(config.weth, config.wild, [config.weth, config.wild]);
+
+
     console.log({
         zapper: zapper.address,
     });
