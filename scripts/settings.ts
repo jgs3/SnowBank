@@ -6,13 +6,13 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    const factory = await ethers.getContractAt("PancakeFactory", config.factory);
+    // const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const token = await ethers.getContractAt("PWildToken", config.wild);
     const zapper = await ethers.getContractAt("ZapV3", config.zap);
     const nft = await ethers.getContractAt("PWiLDNFT", config.nft);
     const masterchef = await ethers.getContractAt("MasterChef", config.masterchef);
 
-    // await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
+    // await token.mint(config.feeAddress, ethers.utils.parseEther("5000000"));
 
     // console.log("setting zapper to whitelist...");
     // await token.setProxy(config.zap);
@@ -22,9 +22,9 @@ async function main() {
     // await token.setPair(config.baseLp);
     // console.log("done");
 
-    console.log("transferring ownership to masterchef...");
-    await token.transferOwnership(config.masterchef);
-    console.log("done");
+    // console.log("transferring ownership to masterchef...");
+    // await token.transferOwnership(config.masterchef);
+    // console.log("done");
 
     //whitelistUser
     // console.log("setting masterchef to whitelist in nft...");
@@ -41,6 +41,8 @@ async function main() {
     // console.log("done");
 
     // console.log("mint nft...");
+    // await nft.mint();
+    // await nft.mint();
     // await nft.mint();
     // await nft.mint();
     // await nft.mint();

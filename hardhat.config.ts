@@ -110,7 +110,7 @@ module.exports = {
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 300,
+                        runs: 500,
                     },
                 },
             },
@@ -119,7 +119,7 @@ module.exports = {
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 300,
+                        runs: 500,
                     },
                 },
             },
@@ -128,7 +128,7 @@ module.exports = {
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 300,
+                        runs: 500,
                     },
                 },
             },
@@ -143,7 +143,7 @@ module.exports = {
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 300,
+                        runs: 500,
                     },
                 },
             },

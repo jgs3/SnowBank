@@ -10,8 +10,8 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const nftContract = await utils.deployAndVerify("PWiLDNFT", [
-        "pWiLD NFT",
-        "pWiLDNFT",
+        "xxx",
+        "xxx",
         "https://wildbase.farm/images/pulse-nfts/",
     ]);
     // const nftContract = await ethers.getContractAt("PWiLDNFT", config.nft);

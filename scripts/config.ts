@@ -1,4 +1,3 @@
-
 // export const config = {
 //     factory: "0xFDa619b6d20975be80A10332cD39b9a4b0FAa8BB",
 //     router: "0x327Df1E6de05895d2ab08513aaDD9313Fe505d86",
@@ -26,8 +25,6 @@
 //     zap: "0xdfC52a028A0F984d39496E60df2BE322919c28E7"
 // };
 
-
-
 const config = {
     factory: "0x29eA7545DEf87022BAdc76323F373EA1e707C523",
     router: "0x165C3410fC91EF562C50559f7d2289fEbed552d9",
@@ -39,5 +36,5 @@ const config = {
     zap: "0xd88927A667e9883e101CEf509A8Da100F00c71fd",
     masterchef: "0x769db848ca1578Eb55B6de7A29fd41C80c0166A7",
     nft: "0xE6f089D0403a39D21DC0892b42bb8B2F249CeDe3",
-    baseLp:"0xc6d949b92b7a698b4178b76ee12d55097052b05a",
+    baseLp: "0xc6d949b92b7a698b4178b76ee12d55097052b05a",
 };

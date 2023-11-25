@@ -2,7 +2,6 @@ import { ethers } from "hardhat";
 
 const { config } = require("../scripts/config");
 
-
 async function main() {
     const [deployer] = await ethers.getSigners();
 
