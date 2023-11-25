@@ -1,19 +1,20 @@
 import { ethers } from "hardhat";
 const utils = require("../scripts/utils");
-const { config } = require("../scripts/config");
+
+import { config } from "./config";
 
 async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await ethers.getContractAt("PWildToken", config.wild);
+    const token = await ethers.getContractAt("BWildToken", config.wild);
 
     const masterChef = await utils.deployAndVerify("MasterChef", [
         token.address,
         config.feeAddress, //dev address
         config.feeAddress, //fee address
-        config.zapper,
+        config.zap,
         config.startTime,
     ]);
     // await token.transferOwnership(masterChef.address);
@@ -22,13 +23,12 @@ async function main() {
 
     // adding new pool
     console.log("adding new pool...");
-    await masterChef.add(700, wildwethPair, 0, false, false);
-    await masterChef.add(0, wethUSDCPair, 900, false, false);
-    await masterChef.add(100, config.weth, 600, false, false);
-    await masterChef.add(50, config.dai, 500, false, false);
-    await masterChef.add(50, config.usdc, 400, false, false);
-    await masterChef.add(50, config.mim, 400, false, false);
+    await masterChef.add(800, wildwethPair, 100, false, false);
+    await masterChef.add(0, wethUSDCPair, 1000, false, false);
+    await masterChef.add(100, config.wild, 300, false, false);
+    await masterChef.add(50, config.weth, 300, false, false);
     await masterChef.add(50, config.nft, 0, false, true);
+
     console.log("done");
 
     console.log({

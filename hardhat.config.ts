@@ -67,11 +67,11 @@ module.exports = {
     },
     etherscan: {
         apiKey: {
-            "base-goerli": config.apiKeyBase,
+            // "base-goerli": config.apiKeyBase,
             "base-mainnet": config.apiKeyBase,
-            "bsc-mainnet": config.apiKeyBSC,
-            "pulse-mainnet": '0',
-            "pulse-testnet": "0"
+            // "bsc-mainnet": config.apiKeyBSC,
+            // "pulse-mainnet": '0',
+            // "pulse-testnet": "0"
         },
         customChains: [
             {
@@ -159,8 +159,8 @@ module.exports = {
         except: ["echidna-test/", "test/", "pancakeSwap/", "@openzeppelin/contracts/"],
     },
     gasReporter: {
-        currency: 'USD',
-        gasPrice: 21
+        currency: "USD",
+        gasPrice: 21,
     },
     abiExporter: {
         path: "./data/abi",

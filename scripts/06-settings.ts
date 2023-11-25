@@ -7,7 +7,7 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     // const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await ethers.getContractAt("PWildToken", config.wild);
+    const token = await ethers.getContractAt("BWildToken", config.wild);
     const zapper = await ethers.getContractAt("ZapV3", config.zap);
     const nft = await ethers.getContractAt("PWiLDNFT", config.nft);
     const masterchef = await ethers.getContractAt("MasterChef", config.masterchef);

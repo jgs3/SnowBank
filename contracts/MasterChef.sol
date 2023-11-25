@@ -2,6 +2,8 @@
 
 
 
+
+
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -11,9 +13,9 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import "./PWildToken.sol";
+import "./BWildToken.sol";
 
-interface IPWildNFT {
+interface IBWildNFT {
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
 }
 
@@ -26,10 +28,10 @@ interface IZap {
     ) external returns (uint256 amountOut);
 }
 
-// MasterChef is the master of PWILD. He can make PWILD and he is a fair guy.
+// MasterChef is the master of BWILD. He can make BWILD and he is a fair guy.
 //
 // Note that it's ownable and the owner wields tremendous power. The ownership
-// will be transferred to a governance smart contract once PWILD is sufficiently
+// will be transferred to a governance smart contract once BWILD is sufficiently
 // distributed and the community can show to govern itself.
 //
 
@@ -47,13 +49,13 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         uint256[] tokenIds; // NFT token IDs which the user has provided.
 
         //
-        // We do some fancy math here. Basically, any point in time, the amount of PWILDs
+        // We do some fancy math here. Basically, any point in time, the amount of BWILDs
         // entitled to a user but is pending to be distributed is:
         //
-        //   pending reward = (user.amount * pool.accPWildPerShare) - user.rewardDebt
+        //   pending reward = (user.amount * pool.accBWildPerShare) - user.rewardDebt
         //
         // Whenever a user deposits or withdraws LP tokens to a pool. Here's what happens:
-        //   1. The pool's `accPWildPerShare` (and `lastRewardTime`) gets updated.
+        //   1. The pool's `accBWildPerShare` (and `lastRewardTime`) gets updated.
         //   2. User receives the pending reward sent to his/her address.
         //   3. User's `amount` gets updated.
         //   4. User's `rewardDebt` gets updated.
@@ -62,26 +64,26 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     // Info of each pool.
     struct PoolInfo {
         address lpToken; // Address of LP token contract.
-        uint256 allocPoint; // How many allocation points assigned to this pool. PWILDs to distribute per block.
-        uint256 lastRewardTime; // Last block number that PWILDs distribution occurs.
-        uint256 accPWildPerShare; // Accumulated PWILDs per share, times 1e18. See below.
+        uint256 allocPoint; // How many allocation points assigned to this pool. BWILDs to distribute per block.
+        uint256 lastRewardTime; // Last block number that BWILDs distribution occurs.
+        uint256 accBWildPerShare; // Accumulated BWILDs per share, times 1e18. See below.
         uint16 depositFeeBP; // Deposit fee in basis points
         bool isNFTPool; // if lastRewardTime has passed
     }
 
-    // The PWILD TOKEN!
-    PWildToken public pWild;
-    // The PWILD Address
-    address public pWildAddr;
+    // The BWILD TOKEN!
+    BWildToken public bWild;
+    // The BWILD Address
+    address public bWildAddr;
     // Zap address
     address public zapAddr;
     // Dev address.
     address public devaddr;
-    // PWILD tokens created per block.
-    uint256 public pWildPerSecond = 0;
+    // BWILD tokens created per block.
+    uint256 public bWildPerSecond = 0;
     // total dev alloc
     uint256 public totalDevAlloc;
-    // Bonus muliplier for early pWild makers.
+    // Bonus muliplier for early bWild makers.
     uint256 public constant BONUS_MULTIPLIER = 1;
     // maximim compound per day, per user.
     // Deposit Fee address
@@ -93,7 +95,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
-    // The timestamp when PWILD mining starts.
+    // The timestamp when BWILD mining starts.
     uint256 public startTime;
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -106,17 +108,17 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     }
 
     constructor(
-        address _pWild,
+        address _bWild,
         address _devaddr,
         address _feeAddress1,
         address _zapAddr,
         uint256 _startTime
     ) {
-        pWild = PWildToken(_pWild);
+        bWild = BWildToken(_bWild);
         devaddr = _devaddr;
         feeAddress = _feeAddress1;
         startTime = _startTime;
-        pWildAddr = _pWild;
+        bWildAddr = _bWild;
         zapAddr = _zapAddr;
     }
 
@@ -153,14 +155,14 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 lpToken: _lpToken,
                 allocPoint: _allocPoint,
                 lastRewardTime: lastRewardTime,
-                accPWildPerShare: 0,
+                accBWildPerShare: 0,
                 depositFeeBP: _depositFeeBP,
                 isNFTPool: _isNFTPool
             })
         );
     }
 
-    // Update the given pool's PWILD allocation point and deposit fee. Can only be called by the owner.
+    // Update the given pool's BWILD allocation point and deposit fee. Can only be called by the owner.
     function set(
         uint256 _pid,
         uint256 _allocPoint,
@@ -183,34 +185,34 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     function getMultiplier(uint256 _fromTime, uint256 _toTime) public view returns (uint256) {
         if (_fromTime >= _toTime) return 0;
         if (_toTime <= startTime) return 0;
-        if (_fromTime <= startTime) return _toTime.sub(startTime).mul(pWildPerSecond);
-        return _toTime.sub(_fromTime).mul(pWildPerSecond);
+        if (_fromTime <= startTime) return _toTime.sub(startTime).mul(bWildPerSecond);
+        return _toTime.sub(_fromTime).mul(bWildPerSecond);
     }
 
-    // View function to see pending PWILDs on frontend.
-    function pendingPWild(uint256 _pid, address _user) external view returns (uint256) {
+    // View function to see pending BWILDs on frontend.
+    function pendingBWild(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
-        uint256 accPWildPerShare = pool.accPWildPerShare;
+        uint256 accBWildPerShare = pool.accBWildPerShare;
         if (pool.isNFTPool) {
             uint256 lpSupply = IERC721(pool.lpToken).balanceOf(address(this));
             if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
                 uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-                uint256 pWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-                accPWildPerShare = accPWildPerShare.add(
-                    pWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
+                uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+                accBWildPerShare = accBWildPerShare.add(
+                    bWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
                 );
             }
             return
-                user.amount.mul(amountPerNFT).mul(accPWildPerShare).div(1e18).sub(user.rewardDebt);
+                user.amount.mul(amountPerNFT).mul(accBWildPerShare).div(1e18).sub(user.rewardDebt);
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
             if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
                 uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-                uint256 pWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-                accPWildPerShare = accPWildPerShare.add(pWildReward.mul(1e18).div(lpSupply));
+                uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+                accBWildPerShare = accBWildPerShare.add(bWildReward.mul(1e18).div(lpSupply));
             }
-            return user.amount.mul(accPWildPerShare).div(1e18).sub(user.rewardDebt);
+            return user.amount.mul(accBWildPerShare).div(1e18).sub(user.rewardDebt);
         }
     }
 
@@ -235,11 +237,11 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 return;
             }
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-            uint256 pWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-            PWildToken(pWild).mint(devaddr, pWildReward.div(5));
-            PWildToken(pWild).mint(address(this), pWildReward);
-            totalDevAlloc += pWildReward.div(5);
-            pool.accPWildPerShare = pool.accPWildPerShare.add(pWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT)));
+            uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+            BWildToken(bWild).mint(devaddr, bWildReward.div(5));
+            BWildToken(bWild).mint(address(this), bWildReward);
+            totalDevAlloc += bWildReward.div(5);
+            pool.accBWildPerShare = pool.accBWildPerShare.add(bWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT)));
             pool.lastRewardTime = block.timestamp;
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
@@ -248,16 +250,16 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 return;
             }
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-            uint256 pWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-            PWildToken(pWild).mint(devaddr, pWildReward.div(5));
-            PWildToken(pWild).mint(address(this), pWildReward);
-            totalDevAlloc += pWildReward.div(5);
-            pool.accPWildPerShare = pool.accPWildPerShare.add(pWildReward.mul(1e18).div(lpSupply));
+            uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+            BWildToken(bWild).mint(devaddr, bWildReward.div(5));
+            BWildToken(bWild).mint(address(this), bWildReward);
+            totalDevAlloc += bWildReward.div(5);
+            pool.accBWildPerShare = pool.accBWildPerShare.add(bWildReward.mul(1e18).div(lpSupply));
             pool.lastRewardTime = block.timestamp;
         }
     }
 
-    // Deposit LP tokens to MasterChef for PWILD allocation.
+    // Deposit LP tokens to MasterChef for BWILD allocation.
     function deposit(uint256 _pid, uint256 _amount, bool isNFTAll) public nonReentrant {
         _deposit(_pid, _amount, isNFTAll);
     }
@@ -276,18 +278,18 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 uint256 pending = user
                     .amount
                     .mul(amountPerNFT)
-                    .mul(pool.accPWildPerShare)
+                    .mul(pool.accBWildPerShare)
                     .div(1e18)
                     .sub(user.rewardDebt);
                 if (pending > 0) {
-                    safePWildTransfer(_recipient, pending);
+                    safeBWildTransfer(_recipient, pending);
                 }
             } else {
-                uint256 pending = user.amount.mul(pool.accPWildPerShare).div(1e18).sub(
+                uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(
                     user.rewardDebt
                 );
                 if (pending > 0) {
-                    safePWildTransfer(_recipient, pending);
+                    safeBWildTransfer(_recipient, pending);
                 }
             }
         }
@@ -310,7 +312,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 }
             }
         }
-        user.rewardDebt = user.amount.mul(pool.accPWildPerShare).div(1e18);
+        user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
         emit Deposit(msg.sender, _pid, _amount);
     }
 
@@ -328,24 +330,24 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 uint256 pending = user
                     .amount
                     .mul(amountPerNFT)
-                    .mul(pool.accPWildPerShare)
+                    .mul(pool.accBWildPerShare)
                     .div(1e18)
                     .sub(user.rewardDebt);
                 if (pending > 0) {
-                    safePWildTransfer(msg.sender, pending);
+                    safeBWildTransfer(msg.sender, pending);
                 }
             } else {
-                uint256 pending = user.amount.mul(pool.accPWildPerShare).div(1e18).sub(
+                uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(
                     user.rewardDebt
                 );
                 if (pending > 0) {
-                    safePWildTransfer(msg.sender, pending);
+                    safeBWildTransfer(msg.sender, pending);
                 }
             }
         }
         if (_amount > 0) {
             if (pool.isNFTPool) {
-                uint256[] memory tokenIds = IPWildNFT(pool.lpToken).walletOfOwner(_sender);
+                uint256[] memory tokenIds = IBWildNFT(pool.lpToken).walletOfOwner(_sender);
                 if (isNFTAll) {
                     if (tokenIds.length > 0) {
                         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -386,9 +388,9 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
             }
         }
         if (pool.isNFTPool) {
-            user.rewardDebt = user.amount.mul(amountPerNFT).mul(pool.accPWildPerShare).div(1e18);
+            user.rewardDebt = user.amount.mul(amountPerNFT).mul(pool.accBWildPerShare).div(1e18);
         } else {
-            user.rewardDebt = user.amount.mul(pool.accPWildPerShare).div(1e18);
+            user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
         }
         emit Deposit(msg.sender, _pid, _amount);
     }
@@ -410,16 +412,16 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
             uint256 pending = user
                 .amount
                 .mul(amountPerNFT)
-                .mul(pool.accPWildPerShare)
+                .mul(pool.accBWildPerShare)
                 .div(1e18)
                 .sub(user.rewardDebt);
             if (pending > 0) {
-                safePWildTransfer(msg.sender, pending);
+                safeBWildTransfer(msg.sender, pending);
             }
         } else {
-            uint256 pending = user.amount.mul(pool.accPWildPerShare).div(1e18).sub(user.rewardDebt);
+            uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(user.rewardDebt);
             if (pending > 0) {
-                safePWildTransfer(msg.sender, pending);
+                safeBWildTransfer(msg.sender, pending);
             }
         }
 
@@ -465,7 +467,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 }
             }
         }
-        user.rewardDebt = user.amount.mul(pool.accPWildPerShare).div(1e18);
+        user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
         emit Withdraw(msg.sender, _pid, _amount);
     }
 
@@ -490,13 +492,13 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         emit EmergencyWithdraw(msg.sender, _pid, amount);
     }
 
-    // Safe pWild transfer function, just in case if rounding error causes pool to not have enough PWILDs.
-    function safePWildTransfer(address _to, uint256 _amount) internal {
-        uint256 pWildBal = pWild.balanceOf(address(this));
-        if (_amount > pWildBal) {
-            pWild.transfer(_to, pWildBal);
+    // Safe bWild transfer function, just in case if rounding error causes pool to not have enough BWILDs.
+    function safeBWildTransfer(address _to, uint256 _amount) internal {
+        uint256 bWildBal = bWild.balanceOf(address(this));
+        if (_amount > bWildBal) {
+            bWild.transfer(_to, bWildBal);
         } else {
-            pWild.transfer(_to, _amount);
+            bWild.transfer(_to, _amount);
         }
     }
 
@@ -506,23 +508,23 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         uint256 amountOut = 0;
         updatePool(_pid);
         if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accPWildPerShare).div(1e18).sub(user.rewardDebt);
-            uint256 pWildBal = pWild.balanceOf(address(this));
+            uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(user.rewardDebt);
+            uint256 bWildBal = bWild.balanceOf(address(this));
 
             if (user.amount > 0) {
                 if (pending > 0) {
-                    if (pending > pWildBal) {
-                        IERC20(pWildAddr).safeIncreaseAllowance(address(zapAddr), pWildBal);
+                    if (pending > bWildBal) {
+                        IERC20(bWildAddr).safeIncreaseAllowance(address(zapAddr), bWildBal);
                         amountOut = IZap(zapAddr).universalZapForCompound(
-                            pWildAddr, //_inputToken
-                            pWildBal, //_amount
+                            bWildAddr, //_inputToken
+                            bWildBal, //_amount
                             pool.lpToken, //_targetToken
                             address(this) //_recipient
                         );
                     } else {
-                        IERC20(pWildAddr).safeIncreaseAllowance(address(zapAddr), pending);
+                        IERC20(bWildAddr).safeIncreaseAllowance(address(zapAddr), pending);
                         amountOut = IZap(zapAddr).universalZapForCompound(
-                            pWildAddr, //_inputToken
+                            bWildAddr, //_inputToken
                             pending, //_amount
                             pool.lpToken, //_targetToken
                             address(this) //_recipient
@@ -540,7 +542,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                     user.amount = user.amount.add(amountOut);
                 }
             }
-            user.rewardDebt = user.amount.mul(pool.accPWildPerShare).div(1e18);
+            user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
         }
     }
 
@@ -555,14 +557,14 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         feeAddress = _feeAddress1;
     }
 
-    function updateEmissionRate(uint256 _pWildPerSecond) public onlyOwner {
+    function updateEmissionRate(uint256 _bWildPerSecond) public onlyOwner {
         massUpdatePools();
-        pWildPerSecond = _pWildPerSecond;
+        bWildPerSecond = _bWildPerSecond;
     }
 
-    function setWildX(address _pWild) public onlyOwner {
-        require(_pWild != address(0), "Invalid Address");
-        pWild = PWildToken(_pWild);
+    function setWildX(address _bWild) public onlyOwner {
+        require(_bWild != address(0), "Invalid Address");
+        bWild = BWildToken(_bWild);
     }
 
     function setAmountPerNFT(uint256 _newAmount) external onlyOwner {

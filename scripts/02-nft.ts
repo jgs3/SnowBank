@@ -1,21 +1,18 @@
 import { ethers } from "hardhat";
 const utils = require("../scripts/utils");
 
-const config = {
-    nft: "0xB258c44E1544e7d91AbC9A617252Ee2c94D8d542",
-};
+import { config } from "./config";
 
 async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    const nftContract = await utils.deployAndVerify("PWiLDNFT", [
-        "xxx",
-        "xxx",
-        "https://wildbase.farm/images/pulse-nfts/",
+    const nftContract = await utils.deployAndVerify("BWiLDNFT", [
+        "BWiLD NFT",
+        "BWiLDNFT",
+        "https://wildbase.farm/images/nfts/",
     ]);
     // const nftContract = await ethers.getContractAt("PWiLDNFT", config.nft);
-
 
     const addresses = [
         // "0x812f22a8539dabfb7260132190397a9da458e41a",
@@ -112,7 +109,7 @@ async function main() {
         // "0xa54cf8845ab2f560bf9aeb6e2d1648a69d4c6529",
         // "0x3af6e4903d7eb6a88ba5ee41f2281d1221ba3928",
         // "0xb95eead438cc2d01a0c4c6f784b658ab770348ee",
-    ]
+    ];
 
     const amounts = [
         // 1,
@@ -209,7 +206,7 @@ async function main() {
         // 25,
         // 26,
         // 26,
-    ]
+    ];
 
     // console.log("adding whitelist...");
     // const tx = await nftContract.setWhiteListsWithMaximumAmount(addresses, amounts);
