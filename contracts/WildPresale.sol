@@ -26,6 +26,7 @@ contract WILDPresale is ReentrancyGuard {
     uint256 public vestingPeriod = 20 days;
 
     uint256 public presalePriceOfToken = 12;
+    uint256 public MAX_AMOUNT = 250 * 1e18;
 
     bool public enabled = true;
     bool public sale_finalized = false;
@@ -65,10 +66,13 @@ contract WILDPresale is ReentrancyGuard {
 
     function buyWILD() public payable nonReentrant {
         if (!enabled || sale_finalized) revert SaleIsNotActive();
+        require(
+            WILDOwned[msg.sender] + msg.value.getConversionRate() / presalePriceOfToken <=
+                MAX_AMOUNT,
+            "Exceed Max Amount"
+        );
         user_deposits[msg.sender] += msg.value;
-        WILDOwned[msg.sender] +=
-            msg.value.getConversionRate() /
-            presalePriceOfToken;
+        WILDOwned[msg.sender] += msg.value.getConversionRate() / presalePriceOfToken;
         total_deposited += msg.value;
     }
 
@@ -95,10 +99,7 @@ contract WILDPresale is ReentrancyGuard {
         uint256 availableAmount = getAmountToWithdraw(msg.sender);
 
         uint256 contractBalance = WILD.balanceOf(address(this));
-        require(
-            contractBalance >= availableAmount,
-            "Insufficient contract balance"
-        );
+        require(contractBalance >= availableAmount, "Insufficient contract balance");
 
         user_withdraw_timestamp[msg.sender] = block.timestamp;
         user_withdraw_amount[msg.sender] += availableAmount;
@@ -111,8 +112,8 @@ contract WILDPresale is ReentrancyGuard {
         if (block.timestamp - user_withdraw_timestamp[msg.sender] < 1 days) {
             return 0;
         } else {
-            uint256 rate = ((block.timestamp - user_withdraw_timestamp[_user]) *
-                100) / vestingPeriod;
+            uint256 rate = ((block.timestamp - user_withdraw_timestamp[_user]) * 100) /
+                vestingPeriod;
 
             uint256 amount = (WILDOwned[_user] * rate) / 100;
             return amount;
@@ -142,9 +143,7 @@ contract WILDPresale is ReentrancyGuard {
     }
 
     function withdraw() external onlyOwner {
-        (bool callSuccess, ) = payable(msg.sender).call{
-            value: address(this).balance
-        }("");
+        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Call failed");
     }
 
