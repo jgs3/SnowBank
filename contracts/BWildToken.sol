@@ -3,6 +3,7 @@
 
 
 
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -22,14 +23,14 @@ contract BWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     uint256 public startTime;
     uint256 public totalBurned;
 
-    uint256 public staticTaxRate = 800;
-    uint256 public MAX_TAX_RATE = 1800;
+    uint256 public staticTaxRate = 600;
+    uint256 public MAX_TAX_RATE = 1300;
     uint256 public constant duration = 1 days;
 
     mapping(address => bool) public isPair;
     mapping(address => bool) public proxylist;
 
-    constructor(address _routerAddress) ERC20("BWiLD Token", "BWiLD") ERC20Permit("BWiLD") {
+    constructor(address _routerAddress) ERC20("WiLDBASE.FARM", "BWiLD") ERC20Permit("BWiLD") {
         admin = msg.sender;
         IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
         address WETH = uniswapV2Router.WETH();

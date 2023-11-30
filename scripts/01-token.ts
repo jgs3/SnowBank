@@ -10,7 +10,7 @@ async function main() {
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const token = await utils.deployAndVerify("BWildToken", [config.router]);
 
-    await token.mint(config.deployerAddress, ethers.utils.parseEther("500000"));
+    await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
 
     const wildwethPair = await factory.getPair(config.weth, token.address);
 

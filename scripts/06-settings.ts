@@ -14,9 +14,9 @@ async function main() {
 
     // await token.mint(config.feeAddress, ethers.utils.parseEther("5000000"));
 
-    console.log("setting zapper to whitelist...");
-    await token.setProxy(config.zap);
-    console.log("done");
+    // console.log("setting zapper to whitelist...");
+    // await token.setProxy(config.zap);
+    // console.log("done");
 
     // console.log("setting lp contract to pair...");
     // await token.setPair(config.baseLp);
@@ -52,7 +52,7 @@ async function main() {
     // console.log("done");
 
     // console.log("transferring ownership of NFT...");
-    // await nft.transferOwnership(config.feeAddress);
+    // await nft.transferOwnership(config.devAddress1);
     // console.log("done");
 }
 
