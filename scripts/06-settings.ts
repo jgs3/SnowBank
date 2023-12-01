@@ -26,27 +26,27 @@ async function main() {
     // await token.transferOwnership(config.masterchef);
     // console.log("done");
 
-    // whitelistUser
-    console.log("setting masterchef to whitelist in nft...");
-    await nft.whitelistUser(config.masterchef);
-    console.log("done");
+    // // whitelistUser
+    // console.log("setting masterchef to whitelist in nft...");
+    // await nft.whitelistUser(config.masterchef);
+    // console.log("done");
 
     // console.log("updating emission...");
     // await masterchef.updateEmissionRate("11000000000000000");
     // console.log("done");
 
-    // // setWhiteListWithMaximumAmount
-    // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
-    // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 5);
-    // console.log("done");
+    // setWhiteListWithMaximumAmount
+    console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
+    await nft.setWhiteListWithMaximumAmount(config.feeAddress, 5);
+    console.log("done");
 
-    // console.log("mint nft...");
-    // await nft.mint();
-    // await nft.mint();
-    // await nft.mint();
-    // await nft.mint();
-    // await nft.mint();
-    // console.log("done");
+    console.log("mint nft...");
+    await nft.mint();
+    await nft.mint();
+    await nft.mint();
+    await nft.mint();
+    await nft.mint();
+    console.log("done");
     // console.log("transferring ownership of masterchef...");
     // await masterchef.transferOwnership(config.feeAddress);
     // console.log("done");
