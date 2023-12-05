@@ -7,7 +7,7 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    const presaleContract = await utils.deployAndVerify("WILDPresale", [config.wild]);
+    const presaleContract = await utils.deployAndVerify("SNOWPresale", [config.snow]);
 
     console.log({
         presaleContract: presaleContract.address,

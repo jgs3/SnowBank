@@ -1,13 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 
-
-
-
-
-
-
-
-
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
@@ -24,7 +16,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./BWildToken.sol";
+import "./SnowToken.sol";
 
 // Part: ZapBase
 
@@ -186,7 +178,7 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
             (address(_targetToken) != address(mainTokenLP))
         ) {
             //Calculate tax variables.
-            uint256 tokenTaxRate = BWildToken(_inputToken).getCurrentTaxRate();
+            uint256 tokenTaxRate = SnowToken(_inputToken).getCurrentTaxRate();
             uint256 taxedAmount = _amount.mul(tokenTaxRate).div(10000);
             //Halve the taxed amount if the target token is an LP token.
             if (tokenType[_targetToken] == TokenType.LP) {

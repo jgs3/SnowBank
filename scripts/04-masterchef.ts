@@ -8,7 +8,7 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await ethers.getContractAt("BWildToken", config.wild);
+    const token = await ethers.getContractAt("SnowToken", config.snow);
 
     const masterChef = await utils.deployAndVerify("MasterChef", [
         token.address,
@@ -18,14 +18,14 @@ async function main() {
         config.startTime,
     ]);
     // await token.transferOwnership(masterChef.address);
-    const wildwethPair = await factory.getPair(config.weth, token.address);
+    const snowwethPair = await factory.getPair(config.weth, token.address);
     const wethUSDCPair = await factory.getPair(config.usdc, config.weth);
 
     // adding new pool
     console.log("adding new pool...");
-    await masterChef.add(850, wildwethPair, 100, false, false);
+    await masterChef.add(850, snowwethPair, 100, false, false);
     await masterChef.add(0, wethUSDCPair, 1000, false, false);
-    await masterChef.add(150, config.wild, 300, false, false);
+    await masterChef.add(150, config.snow, 300, false, false);
     await masterChef.add(0, config.weth, 300, false, false);
     await masterChef.add(0, config.nft, 0, false, true);
 

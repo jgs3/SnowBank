@@ -22,6 +22,18 @@ module.exports = {
                 url: "https://base-mainnet.diamondswap.org/rpc",
             },
         },
+        "ethereum-mainnet": {
+            url: "https://ethereum.publicnode.com",
+            chainId: 1,
+            accounts: config.mainnetAccounts,
+            gasPrice: 1000000000,
+        },
+        "ethereum-testnet": {
+            chainId: 5,
+            url: "https://ethereum-goerli.publicnode.com",
+            accounts: config.mainnetAccounts,
+            gasPrice: 1000000000,
+        },
         "pulse-mainnet": {
             url: "https://rpc.pulsechain.com",
             chainId: 369,
@@ -67,8 +79,10 @@ module.exports = {
     },
     etherscan: {
         apiKey: {
+            // "ethereum-mainnet": config.apiKeyEthereum,
+            "ethereum-testnet": config.apiKeyEthereum,
+            // "base-mainnet": config.apiKeyBase,
             // "base-goerli": config.apiKeyBase,
-            "base-mainnet": config.apiKeyBase,
             // "bsc-mainnet": config.apiKeyBSC,
             // "pulse-mainnet": '0',
             // "pulse-testnet": "0"

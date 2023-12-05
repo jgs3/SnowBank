@@ -1,6 +1,6 @@
 export const config = {
-    factory: "0x591f122D1df761E616c13d265006fcbf4c6d6551",
-    router: "0xCa4EAa32E7081b0c4Ba47e2bDF9B7163907Fe56f",
+    factory: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+    router: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
     startTime: 1698733996, //Date and time (GMT): Thursday, September 7, 2023 2:22:25 PM
 
     // on production
@@ -17,7 +17,7 @@ export const config = {
     weth: "0x4200000000000000000000000000000000000006",
     usdc: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
 
-    wild: "0x3C7E5835D2936d0eD20E2D1c3E693F6DBE10aA8D",
+    snow: "0x3C7E5835D2936d0eD20E2D1c3E693F6DBE10aA8D",
     baseLp: "0x5B6DEA4e6D236d6e0A70982A1c6244FC258c8757",
     nft: "0xCD2aA3A27fa0eDF880391C3846BE438e2A1E0B49",
     zap: "0x391e6f3F1120B7180b233beb864e8Ab76ce60b48",

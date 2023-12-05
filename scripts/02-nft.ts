@@ -7,12 +7,12 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    // const nftContract = await utils.deployAndVerify("BWiLDNFT", [
-    //     "BWiLD NFT",
-    //     "BWiLDNFT",
-    //     "https://wildbase.farm/images/nfts/",
+    // const nftContract = await utils.deployAndVerify("SNOWNFT", [
+    //     "SNOW NFT",
+    //     "SNOWNFT",
+    //     "https://snowbase.farm/images/nfts/",
     // ]);
-    const nftContract = await ethers.getContractAt("BWiLDNFT", config.nft);
+    const nftContract = await ethers.getContractAt("SNOWNFT", config.nft);
 
     const addresses = [
         // "0x812f22a8539dabfb7260132190397a9da458e41a",

@@ -7,8 +7,8 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    // const presaleContract = await utils.deployAndVerify("WILDPresaleFork", [config.wild]);
-    const presaleContract = await ethers.getContractAt("WILDPresaleFork", config.presale);
+    // const presaleContract = await utils.deployAndVerify("SNOWPresaleFork", [config.snow]);
+    const presaleContract = await ethers.getContractAt("SNOWPresaleFork", config.presale);
 
 
     const addresses = [
@@ -204,7 +204,7 @@ async function main() {
     ];
 
     console.log("adding whitelist...");
-    const tx = await presaleContract.setWiLDOwned(addresses, owneds);
+    const tx = await presaleContract.setSnowOwned(addresses, owneds);
     await tx.wait()
     console.log("done");
     console.log({

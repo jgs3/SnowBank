@@ -1,15 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 
-
-
-
-
-
-
-
-
-
-
 pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -17,7 +7,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract BWiLDNFT is ERC721Enumerable, Ownable {
+contract SNOWNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
 
     string public baseURI;
