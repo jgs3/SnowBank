@@ -47,7 +47,7 @@ module.exports = {
             accounts: config.mainnetAccounts,
         },
         "base-mainnet": {
-            url: "https://base-mainnet.diamondswap.org/rpc",
+            url: "https://mainnet.base.org",
             accounts: config.mainnetAccounts,
             gasPrice: 1000000000,
         },

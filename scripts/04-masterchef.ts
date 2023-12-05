@@ -20,17 +20,14 @@ async function main() {
     // await token.transferOwnership(masterChef.address);
     const wildwethPair = await factory.getPair(config.weth, token.address);
     const wethUSDCPair = await factory.getPair(config.usdc, config.weth);
-    
-    console.log({
-        wethUSDCPair: wethUSDCPair,
-    });
+
     // adding new pool
     console.log("adding new pool...");
-    await masterChef.add(800, wildwethPair, 100, false, false);
+    await masterChef.add(850, wildwethPair, 100, false, false);
     await masterChef.add(0, wethUSDCPair, 1000, false, false);
-    await masterChef.add(100, config.wild, 300, false, false);
-    await masterChef.add(50, config.weth, 300, false, false);
-    await masterChef.add(50, config.nft, 0, false, true);
+    await masterChef.add(150, config.wild, 300, false, false);
+    await masterChef.add(0, config.weth, 300, false, false);
+    await masterChef.add(0, config.nft, 0, false, true);
 
     console.log("done");
 

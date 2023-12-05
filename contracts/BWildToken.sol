@@ -4,6 +4,7 @@
 
 
 
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -24,7 +25,7 @@ contract BWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     uint256 public totalBurned;
 
     uint256 public staticTaxRate = 600;
-    uint256 public MAX_TAX_RATE = 1300;
+    uint256 public MAX_TAX_RATE = 1200;
     uint256 public constant duration = 1 days;
 
     mapping(address => bool) public isPair;
@@ -52,7 +53,7 @@ contract BWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     function getCurrentTaxRate() public view returns (uint256) {
         for (uint256 i = 0; i < 30; i++) {
             if (block.timestamp <= startTime + duration * i) {
-                uint256 tax = MAX_TAX_RATE - (i - 1) * 100;
+                uint256 tax = MAX_TAX_RATE - (i - 1) * 100 - 100;
                 return tax < staticTaxRate ? staticTaxRate : tax;
             }
         }

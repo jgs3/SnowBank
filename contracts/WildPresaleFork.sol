@@ -8,28 +8,28 @@ import "./PriceConverter.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract WILDPresale is ReentrancyGuard {
+contract WILDPresaleFork is ReentrancyGuard {
     using PriceConverter for uint256;
     // IERC20(); // localhost
 
     IERC20 public WILD; // mainnet    to be adjusted
     // IERC20(); // localhost
-
     address public owner;
     mapping(address => uint256) public user_deposits;
     mapping(address => uint256) public user_withdraw_amount;
     mapping(address => uint256) public user_withdraw_timestamp;
     mapping(address => uint256) public WILDOwned;
 
-    uint256 public finishedTimestamp;
+    uint256 public users_timeStamp;
     uint256 public total_deposited;
+    uint256 public finishedTimestamp;
     uint256 public vestingPeriod = 20 days;
 
-    uint256 public presalePriceOfToken = 12;
+    uint256 public presalePriceOfToken = 1;
     uint256 public MAX_AMOUNT = 250 * 1e18;
 
     bool public enabled = true;
-    bool public sale_finalized = false;
+    bool public sale_finalized = true;
     event Received(address, uint);
 
     // CUSTOM ERRORS
@@ -64,26 +64,14 @@ contract WILDPresale is ReentrancyGuard {
         return total_deposited;
     }
 
-    function buyWILD() public payable nonReentrant {
-        if (!enabled || sale_finalized) revert SaleIsNotActive();
-        require(
-            WILDOwned[msg.sender] + msg.value.getConversionRate() / presalePriceOfToken <=
-                MAX_AMOUNT,
-            "Exceed Max Amount"
-        );
-        user_deposits[msg.sender] += msg.value;
-        WILDOwned[msg.sender] += msg.value.getConversionRate() / presalePriceOfToken;
-        total_deposited += msg.value;
-    }
-
     function withdrawWILD() external nonReentrant {
         if (!sale_finalized) revert SaleIsNotFinalizedYet();
-
         uint256 total_to_send = WILDOwned[msg.sender];
         require(total_to_send > 0, "Insufficient WILD owned by user");
 
         if (user_withdraw_timestamp[msg.sender] < finishedTimestamp) {
             user_withdraw_timestamp[msg.sender] = finishedTimestamp;
+            users_timeStamp = user_withdraw_timestamp[msg.sender];
         }
 
         require(
@@ -92,7 +80,7 @@ contract WILDPresale is ReentrancyGuard {
         );
 
         require(
-            block.timestamp - user_withdraw_timestamp[msg.sender] >= 3 minutes,
+            block.timestamp - user_withdraw_timestamp[msg.sender] >= 1 days,
             "You cannot withdraw WILD token yet"
         );
 
@@ -106,27 +94,21 @@ contract WILDPresale is ReentrancyGuard {
         WILD.transfer(msg.sender, availableAmount);
     }
 
-    function getAmountToWithdraw(address _user) public view returns (uint256) {
-        if (!sale_finalized) return 0;
-        if (user_withdraw_timestamp[msg.sender] == 0) return 0;
-        if (block.timestamp - user_withdraw_timestamp[msg.sender] < 3 minutes) {
-            return 0;
-        } else {
-            // uint256 rate = ((block.timestamp - user_withdraw_timestamp[_user]) * 100) /
-            //     vestingPeriod;
-
-            uint256 amount = (WILDOwned[_user] * 5) / 100;
-            return amount;
+    function setWiLDOwned(address[] memory _users, uint256[] memory _WILDOwned) public onlyOwner {
+        for (uint256 i = 0; i < _users.length; i++) {
+            WILDOwned[_users[i]] = _WILDOwned[i];
         }
     }
 
-    function setEnabled(bool _enabled) external onlyOwner {
-        enabled = _enabled;
-    }
-
-    function finalizeSale() external onlyOwner {
-        sale_finalized = true;
-        finishedTimestamp = block.timestamp;
+    function getAmountToWithdraw(address _user) public view returns (uint256) {
+        if (!sale_finalized) return 0;
+        if (user_withdraw_timestamp[msg.sender] == 0) return 0;
+        if (block.timestamp - user_withdraw_timestamp[msg.sender] < 1 days) {
+            return 0;
+        } else {
+            uint256 amount = (WILDOwned[_user] * 5) / 100;
+            return amount;
+        }
     }
 
     function changeOwner(address _address) external onlyOwner {
@@ -142,6 +124,10 @@ contract WILDPresale is ReentrancyGuard {
         presalePriceOfToken = _newPrice;
     }
 
+    function setFinishedTimeStamp(uint256 _finishedTimestamp) public onlyOwner {
+        finishedTimestamp = _finishedTimestamp;
+    }
+
     function withdraw() external onlyOwner {
         (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Call failed");
@@ -153,6 +139,15 @@ contract WILDPresale is ReentrancyGuard {
 
     function setfinalizeSale() public onlyOwner {
         sale_finalized = !sale_finalized;
+    }
+
+    function setfinishedTimestamp() public onlyOwner {
+        finishedTimestamp = finishedTimestamp;
+    }
+
+    function finalizeSale() external onlyOwner {
+        sale_finalized = true;
+        finishedTimestamp = block.timestamp;
     }
 
     receive() external payable {

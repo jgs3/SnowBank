@@ -12,7 +12,7 @@ async function main() {
     const nft = await ethers.getContractAt("BWiLDNFT", config.nft);
     const masterchef = await ethers.getContractAt("MasterChef", config.masterchef);
 
-    // await token.mint(config.feeAddress, ethers.utils.parseEther("5000000"));
+    // await token.mint(config.feeAddress1, ethers.utils.parseEther("55000"));
 
     // console.log("setting zapper to whitelist...");
     // await token.setProxy(config.zap);
@@ -26,16 +26,16 @@ async function main() {
     // await token.transferOwnership(config.masterchef);
     // console.log("done");
 
-    // whitelistUser
-    console.log("setting masterchef to whitelist in nft...");
-    await nft.whitelistUser(config.masterchef);
-    console.log("done");
-
-    // console.log("updating emission...");
-    // await masterchef.updateEmissionRate("11000000000000000");
+    // // whitelistUser
+    // console.log("setting masterchef to whitelist in nft...");
+    // await nft.whitelistUser(config.masterchef);
     // console.log("done");
 
-    // // setWhiteListWithMaximumAmount
+    // console.log("updating emission...");
+    // await masterchef.updateEmissionRate("110000000000000");
+    // console.log("done");
+
+    // setWhiteListWithMaximumAmount
     // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
     // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 5);
     // console.log("done");
@@ -47,12 +47,17 @@ async function main() {
     // await nft.mint();
     // await nft.mint();
     // console.log("done");
-    // console.log("transferring ownership of masterchef...");
-    // await masterchef.transferOwnership(config.feeAddress);
-    // console.log("done");
+    console.log("transferring ownership of masterchef...");
+    await masterchef.transferOwnership(config.owner);
+    console.log("done");
 
     // console.log("transferring ownership of NFT...");
     // await nft.transferOwnership(config.devAddress1);
+    // console.log("done");
+
+    // console.log("updating pool info...");
+    // await masterchef.set(0, 950, 100, 1698733996, true);
+    // await masterchef.set(2, 50, 300, 1698733996, true);
     // console.log("done");
 }
 
