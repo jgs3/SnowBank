@@ -3,15 +3,15 @@ export const config = {
     router: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
     startTime: 1698733996, //Date and time (GMT): Thursday, September 7, 2023 2:22:25 PM
 
-    // on production
-    devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
-    feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
+    // // on production
+    // devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
+    // feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
 
     owner: "0xD2fB0936C838C89341Eb5F328e2E4DDd7D12D8F2",
 
-    // // on test
-    // devAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
-    // feeAddress1: "0x41140Df415A2898937d147842C314c70B3aab82E",
+    // on test
+    devAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
+    feeAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
 
     deployerAddress: "0x41140Df415A2898937d147842C314c70B3aab82E",
     weth: "0x4200000000000000000000000000000000000006",

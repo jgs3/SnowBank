@@ -23,16 +23,16 @@ module.exports = {
             },
         },
         "ethereum-mainnet": {
-            url: "https://ethereum.publicnode.com",
+            url: "https://eth.llamarpc.com",
             chainId: 1,
             accounts: config.mainnetAccounts,
-            gasPrice: 1000000000,
+            gasPrice: 100000000,
         },
         "ethereum-testnet": {
             chainId: 5,
-            url: "https://ethereum-goerli.publicnode.com",
+            url: "https://rpc.ankr.com/eth_goerli",
             accounts: config.mainnetAccounts,
-            gasPrice: 1000000000,
+            gasPrice: 2000000000,
         },
         "pulse-mainnet": {
             url: "https://rpc.pulsechain.com",
@@ -80,7 +80,7 @@ module.exports = {
     etherscan: {
         apiKey: {
             // "ethereum-mainnet": config.apiKeyEthereum,
-            "ethereum-testnet": config.apiKeyEthereum,
+            "goerli": config.apiKeyEthereum,
             // "base-mainnet": config.apiKeyBase,
             // "base-goerli": config.apiKeyBase,
             // "bsc-mainnet": config.apiKeyBSC,
