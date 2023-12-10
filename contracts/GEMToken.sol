@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
 
-
-
-
-
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -16,7 +12,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
 import "./pancakeSwap/interfaces/IPancakeRouter02.sol";
 
-contract BWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
+contract GEMToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     using SafeMath for uint256;
 
     address public admin;
@@ -31,7 +27,7 @@ contract BWildToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     mapping(address => bool) public isPair;
     mapping(address => bool) public proxylist;
 
-    constructor(address _routerAddress) ERC20("WiLDBASE.FARM", "BWiLD") ERC20Permit("BWiLD") {
+    constructor(address _routerAddress) ERC20("GEMBASE.FARM", "GEM") ERC20Permit("GEM") {
         admin = msg.sender;
         IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
         address WETH = uniswapV2Router.WETH();

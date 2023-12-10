@@ -8,7 +8,7 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await utils.deployAndVerify("BWildToken", [config.router]);
+    const token = await utils.deployAndVerify("GEMToken", [config.router]);
 
     await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
 

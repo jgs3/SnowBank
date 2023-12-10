@@ -8,7 +8,7 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await ethers.getContractAt("BWildToken", config.wild);
+    const token = await ethers.getContractAt("GEMToken", config.gem);
 
     const masterChef = await utils.deployAndVerify("MasterChef", [
         token.address,
@@ -18,16 +18,16 @@ async function main() {
         config.startTime,
     ]);
     // await token.transferOwnership(masterChef.address);
-    const wildwethPair = await factory.getPair(config.weth, token.address);
+    const gemwethPair = await factory.getPair(config.weth, token.address);
     const wethUSDCPair = await factory.getPair(config.usdc, config.weth);
 
     // adding new pool
     console.log("adding new pool...");
-    await masterChef.add(850, wildwethPair, 100, false, false);
+    await masterChef.add(950, gemwethPair, 100, false, false);
     await masterChef.add(0, wethUSDCPair, 1000, false, false);
-    await masterChef.add(150, config.wild, 300, false, false);
-    await masterChef.add(0, config.weth, 300, false, false);
-    await masterChef.add(0, config.nft, 0, false, true);
+    await masterChef.add(50, config.gem, 300, false, false);
+    // await masterChef.add(0, config.weth, 300, false, false);
+    // await masterChef.add(0, config.nft, 0, false, true);
 
     console.log("done");
 

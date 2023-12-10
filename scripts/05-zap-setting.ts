@@ -11,15 +11,15 @@ async function main() {
     await zapper.setCoreValues(
         config.router,
         config.factory,
-        config.wild,
+        config.gem,
         config.baseLp,
         config.weth
     );
 
-    // weth - wild
-    console.log("set swap path for weth-wild");
-    await zapper.setSwapPath(config.wild, config.weth, [config.wild, config.weth]);
-    await zapper.setSwapPath(config.weth, config.wild, [config.weth, config.wild]);
+    // weth - gem
+    console.log("set swap path for weth-gem");
+    await zapper.setSwapPath(config.gem, config.weth, [config.gem, config.weth]);
+    await zapper.setSwapPath(config.weth, config.gem, [config.weth, config.gem]);
 
 
     console.log({

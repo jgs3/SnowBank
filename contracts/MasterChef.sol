@@ -5,6 +5,9 @@
 
 
 
+
+
+
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -14,9 +17,9 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import "./BWildToken.sol";
+import "./GEMToken.sol";
 
-interface IBWildNFT {
+interface IGEMNFT {
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
 }
 
@@ -29,10 +32,10 @@ interface IZap {
     ) external returns (uint256 amountOut);
 }
 
-// MasterChef is the master of BWILD. He can make BWILD and he is a fair guy.
+// MasterChef is the master of GEM. He can make GEM and he is a fair guy.
 //
 // Note that it's ownable and the owner wields tremendous power. The ownership
-// will be transferred to a governance smart contract once BWILD is sufficiently
+// will be transferred to a governance smart contract once GEM is sufficiently
 // distributed and the community can show to govern itself.
 //
 
@@ -50,13 +53,13 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         uint256[] tokenIds; // NFT token IDs which the user has provided.
 
         //
-        // We do some fancy math here. Basically, any point in time, the amount of BWILDs
+        // We do some fancy math here. Basically, any point in time, the amount of GEMs
         // entitled to a user but is pending to be distributed is:
         //
-        //   pending reward = (user.amount * pool.accBWildPerShare) - user.rewardDebt
+        //   pending reward = (user.amount * pool.accGEMPerShare) - user.rewardDebt
         //
         // Whenever a user deposits or withdraws LP tokens to a pool. Here's what happens:
-        //   1. The pool's `accBWildPerShare` (and `lastRewardTime`) gets updated.
+        //   1. The pool's `accGEMPerShare` (and `lastRewardTime`) gets updated.
         //   2. User receives the pending reward sent to his/her address.
         //   3. User's `amount` gets updated.
         //   4. User's `rewardDebt` gets updated.
@@ -65,26 +68,26 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     // Info of each pool.
     struct PoolInfo {
         address lpToken; // Address of LP token contract.
-        uint256 allocPoint; // How many allocation points assigned to this pool. BWILDs to distribute per block.
-        uint256 lastRewardTime; // Last block number that BWILDs distribution occurs.
-        uint256 accBWildPerShare; // Accumulated BWILDs per share, times 1e18. See below.
+        uint256 allocPoint; // How many allocation points assigned to this pool. GEMs to distribute per block.
+        uint256 lastRewardTime; // Last block number that GEMs distribution occurs.
+        uint256 accGEMPerShare; // Accumulated GEMs per share, times 1e18. See below.
         uint16 depositFeeBP; // Deposit fee in basis points
         bool isNFTPool; // if lastRewardTime has passed
     }
 
-    // The BWILD TOKEN!
-    BWildToken public bWild;
-    // The BWILD Address
-    address public bWildAddr;
+    // The GEM TOKEN!
+    GEMToken public gem;
+    // The GEM Address
+    address public gemAddr;
     // Zap address
     address public zapAddr;
     // Dev address.
     address public devaddr;
-    // BWILD tokens created per block.
-    uint256 public bWildPerSecond = 0;
+    // GEM tokens created per block.
+    uint256 public gemPerSecond = 0;
     // total dev alloc
     uint256 public totalDevAlloc;
-    // Bonus muliplier for early bWild makers.
+    // Bonus muliplier for early gem makers.
     uint256 public constant BONUS_MULTIPLIER = 1;
     // maximim compound per day, per user.
     // Deposit Fee address
@@ -96,7 +99,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
-    // The timestamp when BWILD mining starts.
+    // The timestamp when GEM mining starts.
     uint256 public startTime;
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -109,17 +112,17 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     }
 
     constructor(
-        address _bWild,
+        address _gem,
         address _devaddr,
         address _feeAddress1,
         address _zapAddr,
         uint256 _startTime
     ) {
-        bWild = BWildToken(_bWild);
+        gem = GEMToken(_gem);
         devaddr = _devaddr;
         feeAddress = _feeAddress1;
         startTime = _startTime;
-        bWildAddr = _bWild;
+        gemAddr = _gem;
         zapAddr = _zapAddr;
     }
 
@@ -156,14 +159,14 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 lpToken: _lpToken,
                 allocPoint: _allocPoint,
                 lastRewardTime: lastRewardTime,
-                accBWildPerShare: 0,
+                accGEMPerShare: 0,
                 depositFeeBP: _depositFeeBP,
                 isNFTPool: _isNFTPool
             })
         );
     }
 
-    // Update the given pool's BWILD allocation point and deposit fee. Can only be called by the owner.
+    // Update the given pool's GEM allocation point and deposit fee. Can only be called by the owner.
     function set(
         uint256 _pid,
         uint256 _allocPoint,
@@ -186,34 +189,34 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
     function getMultiplier(uint256 _fromTime, uint256 _toTime) public view returns (uint256) {
         if (_fromTime >= _toTime) return 0;
         if (_toTime <= startTime) return 0;
-        if (_fromTime <= startTime) return _toTime.sub(startTime).mul(bWildPerSecond);
-        return _toTime.sub(_fromTime).mul(bWildPerSecond);
+        if (_fromTime <= startTime) return _toTime.sub(startTime).mul(gemPerSecond);
+        return _toTime.sub(_fromTime).mul(gemPerSecond);
     }
 
-    // View function to see pending BWILDs on frontend.
-    function pendingBWild(uint256 _pid, address _user) external view returns (uint256) {
+    // View function to see pending GEMs on frontend.
+    function pendingGEM(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
-        uint256 accBWildPerShare = pool.accBWildPerShare;
+        uint256 accGEMPerShare = pool.accGEMPerShare;
         if (pool.isNFTPool) {
             uint256 lpSupply = IERC721(pool.lpToken).balanceOf(address(this));
             if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
                 uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-                uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-                accBWildPerShare = accBWildPerShare.add(
-                    bWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
+                uint256 gemReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+                accGEMPerShare = accGEMPerShare.add(
+                    gemReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
                 );
             }
             return
-                user.amount.mul(amountPerNFT).mul(accBWildPerShare).div(1e18).sub(user.rewardDebt);
+                user.amount.mul(amountPerNFT).mul(accGEMPerShare).div(1e18).sub(user.rewardDebt);
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
             if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
                 uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-                uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-                accBWildPerShare = accBWildPerShare.add(bWildReward.mul(1e18).div(lpSupply));
+                uint256 gemReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+                accGEMPerShare = accGEMPerShare.add(gemReward.mul(1e18).div(lpSupply));
             }
-            return user.amount.mul(accBWildPerShare).div(1e18).sub(user.rewardDebt);
+            return user.amount.mul(accGEMPerShare).div(1e18).sub(user.rewardDebt);
         }
     }
 
@@ -238,11 +241,11 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 return;
             }
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-            uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-            BWildToken(bWild).mint(devaddr, bWildReward.div(5));
-            BWildToken(bWild).mint(address(this), bWildReward);
-            totalDevAlloc += bWildReward.div(5);
-            pool.accBWildPerShare = pool.accBWildPerShare.add(bWildReward.mul(1e18).div(lpSupply.mul(amountPerNFT)));
+            uint256 gemReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+            GEMToken(gem).mint(devaddr, gemReward.div(5));
+            GEMToken(gem).mint(address(this), gemReward);
+            totalDevAlloc += gemReward.div(5);
+            pool.accGEMPerShare = pool.accGEMPerShare.add(gemReward.mul(1e18).div(lpSupply.mul(amountPerNFT)));
             pool.lastRewardTime = block.timestamp;
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
@@ -251,21 +254,21 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 return;
             }
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-            uint256 bWildReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
-            BWildToken(bWild).mint(devaddr, bWildReward.div(5));
-            BWildToken(bWild).mint(address(this), bWildReward);
-            totalDevAlloc += bWildReward.div(5);
-            pool.accBWildPerShare = pool.accBWildPerShare.add(bWildReward.mul(1e18).div(lpSupply));
+            uint256 gemReward = multiplier.mul(pool.allocPoint).div(totalAllocPoint);
+            GEMToken(gem).mint(devaddr, gemReward.div(5));
+            GEMToken(gem).mint(address(this), gemReward);
+            totalDevAlloc += gemReward.div(5);
+            pool.accGEMPerShare = pool.accGEMPerShare.add(gemReward.mul(1e18).div(lpSupply));
             pool.lastRewardTime = block.timestamp;
         }
     }
 
-    // Deposit LP tokens to MasterChef for BWILD allocation.
+    // Deposit LP tokens to MasterChef for GEM allocation.
     function deposit(uint256 _pid, uint256 _amount, bool isNFTAll) public nonReentrant {
         _deposit(_pid, _amount, isNFTAll);
     }
 
-    /// @notice Deposit tokens to MasterChef for WILD allocation.
+    /// @notice Deposit tokens to MasterChef for GEM allocation.
     /// @param _pid pool id to deposit to
     /// @param _amount amount of tokens to deposit. This amount should be approved beforehand
     /// @param _recipient lock period in seconds to lock
@@ -279,18 +282,18 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 uint256 pending = user
                     .amount
                     .mul(amountPerNFT)
-                    .mul(pool.accBWildPerShare)
+                    .mul(pool.accGEMPerShare)
                     .div(1e18)
                     .sub(user.rewardDebt);
                 if (pending > 0) {
-                    safeBWildTransfer(_recipient, pending);
+                    safeGEMTransfer(_recipient, pending);
                 }
             } else {
-                uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(
+                uint256 pending = user.amount.mul(pool.accGEMPerShare).div(1e18).sub(
                     user.rewardDebt
                 );
                 if (pending > 0) {
-                    safeBWildTransfer(_recipient, pending);
+                    safeGEMTransfer(_recipient, pending);
                 }
             }
         }
@@ -313,7 +316,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 }
             }
         }
-        user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
+        user.rewardDebt = user.amount.mul(pool.accGEMPerShare).div(1e18);
         emit Deposit(msg.sender, _pid, _amount);
     }
 
@@ -331,24 +334,24 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 uint256 pending = user
                     .amount
                     .mul(amountPerNFT)
-                    .mul(pool.accBWildPerShare)
+                    .mul(pool.accGEMPerShare)
                     .div(1e18)
                     .sub(user.rewardDebt);
                 if (pending > 0) {
-                    safeBWildTransfer(msg.sender, pending);
+                    safeGEMTransfer(msg.sender, pending);
                 }
             } else {
-                uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(
+                uint256 pending = user.amount.mul(pool.accGEMPerShare).div(1e18).sub(
                     user.rewardDebt
                 );
                 if (pending > 0) {
-                    safeBWildTransfer(msg.sender, pending);
+                    safeGEMTransfer(msg.sender, pending);
                 }
             }
         }
         if (_amount > 0) {
             if (pool.isNFTPool) {
-                uint256[] memory tokenIds = IBWildNFT(pool.lpToken).walletOfOwner(_sender);
+                uint256[] memory tokenIds = IGEMNFT(pool.lpToken).walletOfOwner(_sender);
                 if (isNFTAll) {
                     if (tokenIds.length > 0) {
                         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -389,9 +392,9 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
             }
         }
         if (pool.isNFTPool) {
-            user.rewardDebt = user.amount.mul(amountPerNFT).mul(pool.accBWildPerShare).div(1e18);
+            user.rewardDebt = user.amount.mul(amountPerNFT).mul(pool.accGEMPerShare).div(1e18);
         } else {
-            user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
+            user.rewardDebt = user.amount.mul(pool.accGEMPerShare).div(1e18);
         }
         emit Deposit(msg.sender, _pid, _amount);
     }
@@ -413,16 +416,16 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
             uint256 pending = user
                 .amount
                 .mul(amountPerNFT)
-                .mul(pool.accBWildPerShare)
+                .mul(pool.accGEMPerShare)
                 .div(1e18)
                 .sub(user.rewardDebt);
             if (pending > 0) {
-                safeBWildTransfer(msg.sender, pending);
+                safeGEMTransfer(msg.sender, pending);
             }
         } else {
-            uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(user.rewardDebt);
+            uint256 pending = user.amount.mul(pool.accGEMPerShare).div(1e18).sub(user.rewardDebt);
             if (pending > 0) {
-                safeBWildTransfer(msg.sender, pending);
+                safeGEMTransfer(msg.sender, pending);
             }
         }
 
@@ -468,7 +471,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                 }
             }
         }
-        user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
+        user.rewardDebt = user.amount.mul(pool.accGEMPerShare).div(1e18);
         emit Withdraw(msg.sender, _pid, _amount);
     }
 
@@ -493,13 +496,13 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         emit EmergencyWithdraw(msg.sender, _pid, amount);
     }
 
-    // Safe bWild transfer function, just in case if rounding error causes pool to not have enough BWILDs.
-    function safeBWildTransfer(address _to, uint256 _amount) internal {
-        uint256 bWildBal = bWild.balanceOf(address(this));
-        if (_amount > bWildBal) {
-            bWild.transfer(_to, bWildBal);
+    // Safe gem transfer function, just in case if rounding error causes pool to not have enough GEMs.
+    function safeGEMTransfer(address _to, uint256 _amount) internal {
+        uint256 gemBal = gem.balanceOf(address(this));
+        if (_amount > gemBal) {
+            gem.transfer(_to, gemBal);
         } else {
-            bWild.transfer(_to, _amount);
+            gem.transfer(_to, _amount);
         }
     }
 
@@ -509,23 +512,23 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         uint256 amountOut = 0;
         updatePool(_pid);
         if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accBWildPerShare).div(1e18).sub(user.rewardDebt);
-            uint256 bWildBal = bWild.balanceOf(address(this));
+            uint256 pending = user.amount.mul(pool.accGEMPerShare).div(1e18).sub(user.rewardDebt);
+            uint256 gemBal = gem.balanceOf(address(this));
 
             if (user.amount > 0) {
                 if (pending > 0) {
-                    if (pending > bWildBal) {
-                        IERC20(bWildAddr).safeIncreaseAllowance(address(zapAddr), bWildBal);
+                    if (pending > gemBal) {
+                        IERC20(gemAddr).safeIncreaseAllowance(address(zapAddr), gemBal);
                         amountOut = IZap(zapAddr).universalZapForCompound(
-                            bWildAddr, //_inputToken
-                            bWildBal, //_amount
+                            gemAddr, //_inputToken
+                            gemBal, //_amount
                             pool.lpToken, //_targetToken
                             address(this) //_recipient
                         );
                     } else {
-                        IERC20(bWildAddr).safeIncreaseAllowance(address(zapAddr), pending);
+                        IERC20(gemAddr).safeIncreaseAllowance(address(zapAddr), pending);
                         amountOut = IZap(zapAddr).universalZapForCompound(
-                            bWildAddr, //_inputToken
+                            gemAddr, //_inputToken
                             pending, //_amount
                             pool.lpToken, //_targetToken
                             address(this) //_recipient
@@ -543,7 +546,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                     user.amount = user.amount.add(amountOut);
                 }
             }
-            user.rewardDebt = user.amount.mul(pool.accBWildPerShare).div(1e18);
+            user.rewardDebt = user.amount.mul(pool.accGEMPerShare).div(1e18);
         }
     }
 
@@ -558,14 +561,14 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         feeAddress = _feeAddress1;
     }
 
-    function updateEmissionRate(uint256 _bWildPerSecond) public onlyOwner {
+    function updateEmissionRate(uint256 _gemPerSecond) public onlyOwner {
         massUpdatePools();
-        bWildPerSecond = _bWildPerSecond;
+        gemPerSecond = _gemPerSecond;
     }
 
-    function setWildX(address _bWild) public onlyOwner {
-        require(_bWild != address(0), "Invalid Address");
-        bWild = BWildToken(_bWild);
+    function setGemX(address _gem) public onlyOwner {
+        require(_gem != address(0), "Invalid Address");
+        gem = GEMToken(_gem);
     }
 
     function setAmountPerNFT(uint256 _newAmount) external onlyOwner {
