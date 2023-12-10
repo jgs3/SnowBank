@@ -7,12 +7,12 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
-    // const nftContract = await utils.deployAndVerify("SNOWNFT", [
-    //     "SNOW NFT",
-    //     "SNOWNFT",
-    //     "https://snowbase.farm/images/nfts/",
-    // ]);
-    const nftContract = await ethers.getContractAt("SNOWNFT", config.nft);
+    const nftContract = await utils.deployAndVerify("SNOWNFT", [
+        "SNOW NFT",
+        "SNOWNFT",
+        "https://snowbase.farm/images/nfts/",
+    ]);
+    // const nftContract = await ethers.getContractAt("SNOWNFT", config.nft);
 
     const addresses = [
         // "0x812f22a8539dabfb7260132190397a9da458e41a",
@@ -210,10 +210,10 @@ async function main() {
         // 5
     ];
 
-    console.log("adding whitelist...");
-    const tx = await nftContract.setWhiteListsWithMaximumAmount(addresses, amounts);
-    await tx.wait()
-    console.log("done");
+    // console.log("adding whitelist...");
+    // const tx = await nftContract.setWhiteListsWithMaximumAmount(addresses, amounts);
+    // await tx.wait()
+    // console.log("done");
 
     console.log({
         nftContract: nftContract.address,

@@ -80,8 +80,8 @@ module.exports = {
     etherscan: {
         apiKey: {
             // "ethereum-mainnet": config.apiKeyEthereum,
-            "goerli": config.apiKeyEthereum,
-            // "base-mainnet": config.apiKeyBase,
+            // "goerli": config.apiKeyEthereum,
+            "base-mainnet": config.apiKeyBase,
             // "base-goerli": config.apiKeyBase,
             // "bsc-mainnet": config.apiKeyBSC,
             // "pulse-mainnet": '0',

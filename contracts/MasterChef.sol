@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 
 
+
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -305,7 +307,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                     uint256 depositFee = _amount.mul(pool.depositFeeBP).div(10000);
 
                     IERC20(pool.lpToken).safeTransfer(feeAddress, depositFee);
-
+                    
                     user.amount = user.amount.add(_amount).sub(depositFee);
                 } else {
                     user.amount = user.amount.add(_amount);

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 
 
+
+
 pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -18,6 +20,7 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
     mapping(address => bool) public whitelisted;
     mapping(uint256 => address) public ownerOfToken;
     mapping(address => uint256) public maxMintAmountPerUser;
+    address public presale;
 
     event Received(address, uint);
 
@@ -125,7 +128,20 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
         return maxMintAmountPerUser[_user];
     }
 
+    function getWhitelisted(address _user) external view returns (bool) {
+        return whitelisted[_user];
+    }
+
     function whitelistUser(address _user) public onlyOwner {
+        whitelisted[_user] = true;
+    }
+
+    function setPresale(address _presale) public onlyOwner {
+        presale = _presale;
+    }
+
+    function setWhiteList(address _user) external {
+        require(msg.sender == presale, "not allowed to set user as a whitelisted");
         whitelisted[_user] = true;
     }
 

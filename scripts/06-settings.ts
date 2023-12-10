@@ -11,8 +11,9 @@ async function main() {
     const zapper = await ethers.getContractAt("ZapV3", config.zap);
     const nft = await ethers.getContractAt("SNOWNFT", config.nft);
     const masterchef = await ethers.getContractAt("MasterChef", config.masterchef);
+    const presale = await ethers.getContractAt("SNOWPresale", config.presale);
 
-    // await token.mint(config.feeAddress1, ethers.utils.parseEther("55000"));
+    // await token.mint(config.feeAddress, ethers.utils.parseEther("55000"));
 
     // console.log("setting zapper to whitelist...");
     // await token.setProxy(config.zap);
@@ -26,9 +27,14 @@ async function main() {
     // await token.transferOwnership(config.masterchef);
     // console.log("done");
 
-    // // whitelistUser
+    // whitelistUser
     // console.log("setting masterchef to whitelist in nft...");
     // await nft.whitelistUser(config.masterchef);
+    // console.log("done");
+
+    // // whitelistUser
+    // console.log("setting Presale to whitelist in nft...");
+    // await nft.whitelistUser(config.presale);
     // console.log("done");
 
     // console.log("updating emission...");
@@ -37,7 +43,7 @@ async function main() {
 
     // setWhiteListWithMaximumAmount
     // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
-    // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 5);
+    // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 10);
     // console.log("done");
 
     // console.log("mint nft...");
@@ -46,10 +52,20 @@ async function main() {
     // await nft.mint();
     // await nft.mint();
     // await nft.mint();
+    // await nft.mint();
     // console.log("done");
-    console.log("transferring ownership of masterchef...");
-    await masterchef.transferOwnership(config.owner);
+
+    // console.log("builkmint nft...");
+    // await nft.bulkMint([config.presale, config.presale, config.presale, config.presale]);
+    // console.log("done");
+
+    console.log("builkmint nft...");
+    await presale.depositNFTs(6);
     console.log("done");
+
+    // console.log("transferring ownership of masterchef...");
+    // await masterchef.transferOwnership(config.owner);
+    // console.log("done");
 
     // console.log("transferring ownership of NFT...");
     // await nft.transferOwnership(config.devAddress1);
