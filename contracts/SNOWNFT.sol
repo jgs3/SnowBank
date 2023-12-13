@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 
-
-
-
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract SNOWNFT is ERC721Enumerable, Ownable {
+contract SNOWNFT is ERC721Enumerable {
     using Strings for uint256;
 
     string public baseURI;
@@ -20,16 +16,23 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
     mapping(address => bool) public whitelisted;
     mapping(uint256 => address) public ownerOfToken;
     mapping(address => uint256) public maxMintAmountPerUser;
-    address public presale;
+    mapping(address => bool) public owners;
 
     event Received(address, uint);
 
     constructor(
         string memory _name,
         string memory _symbol,
-        string memory _initBaseURI
+        string memory _initBaseURI,
+        address _owner
     ) ERC721(_name, _symbol) {
+        owners[_owner] = true;
         setBaseURI(_initBaseURI);
+    }
+
+    modifier onlyAdmin() {
+        require(owners[msg.sender] == true, "Caller is not in owners");
+        _;
     }
 
     // internal
@@ -49,14 +52,14 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
     }
 
     // bulk mint
-    function bulkMint(address[] memory _users) external onlyOwner {
+    function bulkMint(address[] memory _users) external onlyAdmin {
         require(!paused);
         for (uint256 i = 0; i < _users.length; i++) {
             uint256 supply = totalSupply();
             require(whitelisted[_users[i]], "User is not whitelisted");
             require(maxMintAmountPerUser[_users[i]] > 0, "Exceed maximum mint amount");
             ownerOfToken[supply + 1] = _users[i];
-            maxMintAmountPerUser[msg.sender] = maxMintAmountPerUser[msg.sender] - 1;
+            maxMintAmountPerUser[_users[i]] = maxMintAmountPerUser[_users[i]] - 1;
             _safeMint(_users[i], supply + 1);
         }
     }
@@ -70,7 +73,7 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
         super._transfer(from, to, tokenId);
     }
 
-    function setTradable(bool _flag) external onlyOwner {
+    function setTradable(bool _flag) external onlyAdmin {
         tradable = _flag;
     }
 
@@ -93,22 +96,22 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
                 : "";
     }
 
-    function setBaseURI(string memory _newBaseURI) public onlyOwner {
+    function setBaseURI(string memory _newBaseURI) public onlyAdmin {
         baseURI = _newBaseURI;
     }
 
-    function setBaseExtension(string memory _newBaseExtension) public onlyOwner {
+    function setBaseExtension(string memory _newBaseExtension) public onlyAdmin {
         baseExtension = _newBaseExtension;
     }
 
-    function pause(bool _state) public onlyOwner {
+    function pause(bool _state) public onlyAdmin {
         paused = _state;
     }
 
     function setWhiteListsWithMaximumAmount(
         address[] memory _users,
         uint256[] memory _maxMintAmount
-    ) external onlyOwner {
+    ) external onlyAdmin {
         require(_users.length == _maxMintAmount.length, "Invalid parameters");
         for (uint256 i = 0; i < _users.length; i++) {
             whitelisted[_users[i]] = true;
@@ -119,7 +122,7 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
     function setWhiteListWithMaximumAmount(
         address _user,
         uint256 _maxMintAmount
-    ) external onlyOwner {
+    ) external onlyAdmin {
         whitelisted[_user] = true;
         maxMintAmountPerUser[_user] = _maxMintAmount;
     }
@@ -132,20 +135,23 @@ contract SNOWNFT is ERC721Enumerable, Ownable {
         return whitelisted[_user];
     }
 
-    function whitelistUser(address _user) public onlyOwner {
+    function whitelistUser(address _user) public onlyAdmin {
         whitelisted[_user] = true;
     }
 
-    function setPresale(address _presale) public onlyOwner {
-        presale = _presale;
-    }
-
-    function setWhiteList(address _user) external {
-        require(msg.sender == presale, "not allowed to set user as a whitelisted");
+    function setWhiteList(address _user) internal {
         whitelisted[_user] = true;
     }
 
-    function removeWhitelistUser(address _user) public onlyOwner {
+    function addOwner(address _newOwner) external onlyAdmin {
+        owners[_newOwner] = true;
+    }
+
+    function removeOwner(address _ownerToRemove) external onlyAdmin {
+        owners[_ownerToRemove] = false;
+    }
+
+    function removeWhitelistUser(address _user) public onlyAdmin {
         whitelisted[_user] = false;
     }
 }

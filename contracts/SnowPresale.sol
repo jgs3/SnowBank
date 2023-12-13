@@ -3,16 +3,18 @@
 pragma solidity ^0.8.15;
 
 import "./PriceConverter.sol";
+import "./SNOWNFT.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-interface ISnowNFT {
+interface ISNOWNFT {
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
+    function setWhiteList(address _newOwner) external;
 }
 
-contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
+contract SNOWPresale is IERC721Receiver, ReentrancyGuard, SNOWNFT {
     using PriceConverter for uint256;
 
     IERC20 public SNOW; // mainnet to be adjusted
@@ -23,9 +25,9 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     mapping(address => uint256) public user_withdraw_amount;
     mapping(address => uint256) public user_withdraw_timestamp;
     mapping(address => uint256) public SNOWOwned;
+    mapping(address => uint256) public NFTs_per_user;
 
     uint256 public finishedTimestamp;
-    uint256 public NFTBoughtTimestamp;
     uint256 public total_deposited;
     uint256[] public soldedNFTs;
 
@@ -84,8 +86,10 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     function buyNFT(uint256 _NFTID) public payable nonReentrant {
         if (!enabled || sale_finalized) revert SaleIsNotActive();
         require(msg.value >= NFTPrice, "Not enough Ether provided.");
+        require(NFTs_per_user[msg.sender] <= 2, "Exceed max per user NFT amount");
+        ISNOWNFT(NFT).setWhiteList(msg.sender);
         IERC721(NFT).safeTransferFrom(address(this), msg.sender, _NFTID);
-        NFTBoughtTimestamp = block.timestamp;
+        NFTs_per_user[msg.sender] = NFTs_per_user[msg.sender] + 1;
     }
 
     function buySNOW() public payable nonReentrant {
@@ -145,7 +149,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     }
 
     function depositNFTs(uint256 _amount) public onlyOwner {
-        uint256[] memory tokenIds = ISnowNFT(NFT).walletOfOwner(msg.sender);
+        uint256[] memory tokenIds = ISNOWNFT(NFT).walletOfOwner(msg.sender);
 
         require(tokenIds.length >= _amount, "Invalid token amount");
         if (tokenIds.length > 0) {
@@ -194,7 +198,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     }
 
     function withdrawNFTs() public onlyOwner {
-        uint256[] memory tokenIds = ISnowNFT(NFT).walletOfOwner(address(this));
+        uint256[] memory tokenIds = ISNOWNFT(NFT).walletOfOwner(address(this));
         require(tokenIds.length > 0, "no NFTs");
         for (uint256 i = 0; i < tokenIds.length; i++) {
             IERC721(NFT).safeTransferFrom(address(this), msg.sender, tokenIds[i]);

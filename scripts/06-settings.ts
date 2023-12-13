@@ -41,7 +41,7 @@ async function main() {
     // await masterchef.updateEmissionRate("110000000000000");
     // console.log("done");
 
-    // setWhiteListWithMaximumAmount
+    // // setWhiteListWithMaximumAmount
     // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
     // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 10);
     // console.log("done");
@@ -56,7 +56,23 @@ async function main() {
     // console.log("done");
 
     // console.log("builkmint nft...");
-    // await nft.bulkMint([config.presale, config.presale, config.presale, config.presale]);
+    // await nft.bulkMint([
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    //     config.presale,
+    // ]);
+    // console.log("done");
+
+    // // setWhiteListWithMaximumAmount
+    // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
+    // await nft.setApprovalForAll(config.presale, true);
     // console.log("done");
 
     console.log("builkmint nft...");
