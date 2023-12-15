@@ -1,13 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
 
-
-
-
-
-
-
-
 pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -207,8 +200,7 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
                     gemReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
                 );
             }
-            return
-                user.amount.mul(amountPerNFT).mul(accGEMPerShare).div(1e18).sub(user.rewardDebt);
+            return user.amount.mul(amountPerNFT).mul(accGEMPerShare).div(1e18).sub(user.rewardDebt);
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
             if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
@@ -245,7 +237,9 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
             GEMToken(gem).mint(devaddr, gemReward.div(5));
             GEMToken(gem).mint(address(this), gemReward);
             totalDevAlloc += gemReward.div(5);
-            pool.accGEMPerShare = pool.accGEMPerShare.add(gemReward.mul(1e18).div(lpSupply.mul(amountPerNFT)));
+            pool.accGEMPerShare = pool.accGEMPerShare.add(
+                gemReward.mul(1e18).div(lpSupply.mul(amountPerNFT))
+            );
             pool.lastRewardTime = block.timestamp;
         } else {
             uint256 lpSupply = IERC20(pool.lpToken).balanceOf(address(this));
@@ -413,12 +407,9 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
         updatePool(_pid);
         address _sender = msg.sender;
         if (pool.isNFTPool) {
-            uint256 pending = user
-                .amount
-                .mul(amountPerNFT)
-                .mul(pool.accGEMPerShare)
-                .div(1e18)
-                .sub(user.rewardDebt);
+            uint256 pending = user.amount.mul(amountPerNFT).mul(pool.accGEMPerShare).div(1e18).sub(
+                user.rewardDebt
+            );
             if (pending > 0) {
                 safeGEMTransfer(msg.sender, pending);
             }
@@ -582,5 +573,13 @@ contract MasterChef is IERC721Receiver, Ownable, ReentrancyGuard {
 
     function getUserStakedNFTs(uint256 _pid, address _user) public view returns (uint256[] memory) {
         return userInfo[_pid][_user].tokenIds;
+    }
+
+    function setMaxTaxRate(uint256 _newMaxRate) external onlyOwner {
+        GEMToken(gem).setMaxTaxRate(_newMaxRate);
+    }
+
+    function setStaticTaxRate(uint256 _newStaticRate) external onlyOwner {
+        GEMToken(gem).setStaticTaxRate(_newStaticRate);
     }
 }

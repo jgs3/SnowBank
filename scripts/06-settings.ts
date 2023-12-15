@@ -8,19 +8,17 @@ async function main() {
     console.log("deployer address:", deployer.address);
     // const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const token = await ethers.getContractAt("GEMToken", config.gem);
-    const zapper = await ethers.getContractAt("ZapV3", config.zap);
-    const nft = await ethers.getContractAt("GEMNFT", config.nft);
+    // const zapper = await ethers.getContractAt("ZapV3", config.zap);
+    // const nft = await ethers.getContractAt("GEMNFT", config.nft);
     const masterchef = await ethers.getContractAt("MasterChef", config.masterchef);
 
-    // await token.mint(config.deployerAddress, ethers.utils.parseEther("100"));
+    // console.log("setting zapper to whitelist...");
+    // await token.setProxy(config.zap);
+    // console.log("done");
 
-    console.log("setting zapper to whitelist...");
-    await token.setProxy(config.zap);
-    console.log("done");
-
-    console.log("setting lp contract to pair...");
-    await token.setPair(config.baseLp);
-    console.log("done");
+    // console.log("setting lp contract to pair...");
+    // await token.setPair(config.baseLp);
+    // console.log("done");
 
     // console.log("transferring ownership to masterchef...");
     // await token.transferOwnership(config.masterchef);
@@ -31,8 +29,12 @@ async function main() {
     // await nft.whitelistUser(config.masterchef);
     // console.log("done");
 
+    // console.log("updating emission...");
+    // await masterchef.updateEmissionRate("50000000000000000");
+    // console.log("done");
+
     console.log("updating emission...");
-    await masterchef.updateEmissionRate("1000000000000000");
+    await masterchef.updateEmissionRate("500000000000");
     console.log("done");
 
     // setWhiteListWithMaximumAmount

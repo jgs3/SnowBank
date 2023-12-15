@@ -10,7 +10,8 @@ async function main() {
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
     const token = await utils.deployAndVerify("GEMToken", [config.router]);
 
-    await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
+    await token.mint(config.feeAddress, ethers.utils.parseEther("3000"));
+    await token.mint(config.deployerAddress, ethers.utils.parseEther("100"));
 
     const wildwethPair = await factory.getPair(config.weth, token.address);
 
