@@ -8,15 +8,15 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
-    const token = await utils.deployAndVerify("SnowToken", [config.router]);
+    const token = await utils.deployAndVerify("SnowToken", []);
 
     await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
 
-    const snowwethPair = await factory.getPair(config.weth, token.address);
+    // const snowwethPair = await factory.getPair(config.weth, token.address);
 
     console.log({
         token: token.address,
-        snowwethPair: snowwethPair,
+        // snowwethPair: snowwethPair,
         // usdcWethPair: usdcWethPair,
     });
 }

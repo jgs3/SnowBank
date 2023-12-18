@@ -81,10 +81,10 @@ module.exports = {
         apiKey: {
             // "ethereum-mainnet": config.apiKeyEthereum,
             // "goerli": config.apiKeyEthereum,
-            "base-mainnet": config.apiKeyBase,
+            // "base-mainnet": config.apiKeyBase,
             // "base-goerli": config.apiKeyBase,
             // "bsc-mainnet": config.apiKeyBSC,
-            // "pulse-mainnet": '0',
+            "pulse-mainnet": '0',
             // "pulse-testnet": "0"
         },
         customChains: [
@@ -108,7 +108,7 @@ module.exports = {
                 network: "pulse-mainnet",
                 chainId: 369,
                 urls: {
-                    apiURL: "https://scan.pulsechain.com/api",
+                    apiURL: "https://api.scan.pulsechain.com/api",
                     browserURL: "https://rpc.pulsechain.com",
                 },
             },

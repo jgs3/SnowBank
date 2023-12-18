@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
+
 pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -135,7 +136,7 @@ contract SNOWNFT is ERC721Enumerable {
         return whitelisted[_user];
     }
 
-    function whitelistUser(address _user) public onlyAdmin {
+    function whitelistUser(address _user) external onlyAdmin {
         whitelisted[_user] = true;
     }
 

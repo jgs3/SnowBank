@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 
+
+
 pragma solidity ^0.8.15;
 
 import "./PriceConverter.sol";
@@ -11,12 +13,12 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 interface ISNOWNFT {
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
-    function setWhiteList(address _newOwner) external;
 }
 
-contract SNOWPresale is IERC721Receiver, ReentrancyGuard, SNOWNFT {
+contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     using PriceConverter for uint256;
 
+    SNOWNFT public SNOWNFT_CONTRACT;
     IERC20 public SNOW; // mainnet to be adjusted
     address public NFT;
     address public owner;
@@ -50,6 +52,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard, SNOWNFT {
     constructor(address _snow, address _NFT) {
         SNOW = IERC20(_snow);
         owner = msg.sender;
+        SNOWNFT_CONTRACT = SNOWNFT(_NFT);
         NFT = _NFT;
     }
 
@@ -86,8 +89,8 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard, SNOWNFT {
     function buyNFT(uint256 _NFTID) public payable nonReentrant {
         if (!enabled || sale_finalized) revert SaleIsNotActive();
         require(msg.value >= NFTPrice, "Not enough Ether provided.");
-        require(NFTs_per_user[msg.sender] <= 2, "Exceed max per user NFT amount");
-        ISNOWNFT(NFT).setWhiteList(msg.sender);
+        require(NFTs_per_user[msg.sender] == 0, "Exceed max per user NFT amount");
+        SNOWNFT_CONTRACT.whitelistUser(msg.sender);
         IERC721(NFT).safeTransferFrom(address(this), msg.sender, _NFTID);
         NFTs_per_user[msg.sender] = NFTs_per_user[msg.sender] + 1;
     }
@@ -124,7 +127,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard, SNOWNFT {
             "You cannot withdraw SNOW token yet"
         );
 
-        uint256 availableAmount = getAmountToWithdraw(msg.sender);
+        uint256 availableAmount = (SNOWOwned[msg.sender] * 5) / 100;
         uint256 contractBalance = SNOW.balanceOf(address(this));
 
         require(contractBalance >= availableAmount, "Insufficient contract balance");
@@ -132,20 +135,6 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard, SNOWNFT {
         user_withdraw_timestamp[msg.sender] = block.timestamp;
         user_withdraw_amount[msg.sender] += availableAmount;
         SNOW.transfer(msg.sender, availableAmount);
-    }
-
-    function getAmountToWithdraw(address _user) public view returns (uint256) {
-        if (!sale_finalized) return 0;
-        if (user_withdraw_timestamp[msg.sender] == 0) return 0;
-        if (block.timestamp - user_withdraw_timestamp[msg.sender] < 3 minutes) {
-            return 0;
-        } else {
-            // uint256 rate = ((block.timestamp - user_withdraw_timestamp[_user]) * 100) /
-            //     vestingPeriod;
-
-            uint256 amount = (SNOWOwned[_user] * rate) / 100;
-            return amount;
-        }
     }
 
     function depositNFTs(uint256 _amount) public onlyOwner {

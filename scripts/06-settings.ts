@@ -32,10 +32,10 @@ async function main() {
     // await nft.whitelistUser(config.masterchef);
     // console.log("done");
 
-    // // whitelistUser
-    // console.log("setting Presale to whitelist in nft...");
-    // await nft.whitelistUser(config.presale);
-    // console.log("done");
+    // whitelistUser
+    console.log("setting Presale to whitelist in nft...");
+    await nft.whitelistUser(config.presale);
+    console.log("done");
 
     // console.log("updating emission...");
     // await masterchef.updateEmissionRate("110000000000000");
@@ -70,14 +70,14 @@ async function main() {
     // ]);
     // console.log("done");
 
-    // // setWhiteListWithMaximumAmount
-    // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
-    // await nft.setApprovalForAll(config.presale, true);
-    // console.log("done");
-
-    console.log("builkmint nft...");
-    await presale.depositNFTs(6);
+    // setWhiteListWithMaximumAmount
+    console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
+    await nft.setApprovalForAll(config.presale, true);
     console.log("done");
+
+    // console.log("builkmint nft...");
+    // await presale.depositNFTs(3);
+    // console.log("done");
 
     // console.log("transferring ownership of masterchef...");
     // await masterchef.transferOwnership(config.owner);

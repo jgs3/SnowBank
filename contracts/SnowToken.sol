@@ -9,6 +9,8 @@
 
 
 
+
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -35,13 +37,13 @@ contract SnowToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     mapping(address => bool) public isPair;
     mapping(address => bool) public proxylist;
 
-    constructor(address _routerAddress) ERC20("SNOW BANK", "SNOW") ERC20Permit("SNOW") {
+    constructor() ERC20("SNOW BANK", "SNOW") ERC20Permit("SNOW") {
         admin = msg.sender;
-        IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
-        address WETH = uniswapV2Router.WETH();
+        // IPancakeRouter02 uniswapV2Router = IPancakeRouter02(_routerAddress);
+        // address WETH = uniswapV2Router.WETH();
         // Create a uniswap pair for this new token
-        address pair = IPancakeFactory(uniswapV2Router.factory()).createPair(address(this), WETH);
-        isPair[pair] = true;
+        // address pair = IPancakeFactory(uniswapV2Router.factory()).createPair(address(this), WETH);
+        // isPair[pair] = true;
         startTime = block.timestamp;
         admin = msg.sender;
     }
@@ -57,7 +59,7 @@ contract SnowToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     function getCurrentTaxRate() public view returns (uint256) {
         for (uint256 i = 0; i < 30; i++) {
             if (block.timestamp <= startTime + duration * i) {
-                uint256 tax = MAX_TAX_RATE - (i - 1) * 100 - 100;
+                uint256 tax = MAX_TAX_RATE - (i - 1) * 200;
                 return tax < staticTaxRate ? staticTaxRate : tax;
             }
         }
