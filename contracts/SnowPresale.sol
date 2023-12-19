@@ -35,7 +35,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
 
     uint256 public NFTPrice = 0.3 * 10 ** 18;
     uint256 public vestingPeriod = 20 days;
-    uint256 public presalePriceOfToken = 12;
+    uint256 public presalePriceOfToken = 4;
     uint256 public MAX_AMOUNT = 250 * 1e18;
     uint256 public rate = 5;
 
@@ -89,7 +89,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     function buyNFT(uint256 _NFTID) public payable nonReentrant {
         if (!enabled || sale_finalized) revert SaleIsNotActive();
         require(msg.value >= NFTPrice, "Not enough Ether provided.");
-        require(NFTs_per_user[msg.sender] == 0, "Exceed max per user NFT amount");
+        // require(NFTs_per_user[msg.sender] == 0, "Exceed max per user NFT amount");
         SNOWNFT_CONTRACT.whitelistUser(msg.sender);
         IERC721(NFT).safeTransferFrom(address(this), msg.sender, _NFTID);
         NFTs_per_user[msg.sender] = NFTs_per_user[msg.sender] + 1;
@@ -98,12 +98,12 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     function buySNOW() public payable nonReentrant {
         if (!enabled || sale_finalized) revert SaleIsNotActive();
         require(
-            SNOWOwned[msg.sender] + msg.value.getConversionRate() / presalePriceOfToken <=
+            SNOWOwned[msg.sender] + (msg.value.getConversionRate() * 100) / presalePriceOfToken <=
                 MAX_AMOUNT,
             "Exceed Max Amount"
         );
         user_deposits[msg.sender] += msg.value;
-        SNOWOwned[msg.sender] += msg.value.getConversionRate() / presalePriceOfToken;
+        SNOWOwned[msg.sender] += (msg.value.getConversionRate() * 100) / presalePriceOfToken;
         total_deposited += msg.value;
     }
 
@@ -123,7 +123,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
         );
 
         require(
-            block.timestamp - user_withdraw_timestamp[msg.sender] >= 3 minutes,
+            block.timestamp - user_withdraw_timestamp[msg.sender] >= 1 minutes,
             "You cannot withdraw SNOW token yet"
         );
 

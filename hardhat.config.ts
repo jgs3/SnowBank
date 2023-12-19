@@ -81,10 +81,10 @@ module.exports = {
         apiKey: {
             // "ethereum-mainnet": config.apiKeyEthereum,
             // "goerli": config.apiKeyEthereum,
-            // "base-mainnet": config.apiKeyBase,
+            "base-mainnet": config.apiKeyBase,
             // "base-goerli": config.apiKeyBase,
             // "bsc-mainnet": config.apiKeyBSC,
-            "pulse-mainnet": '0',
+            // "pulse-mainnet": '0',
             // "pulse-testnet": "0"
         },
         customChains: [

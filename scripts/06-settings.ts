@@ -32,9 +32,14 @@ async function main() {
     // await nft.whitelistUser(config.masterchef);
     // console.log("done");
 
+    // // whitelistUser
+    // console.log("setting Presale to whitelist in nft...");
+    // await nft.whitelistUser(config.presale);
+    // console.log("done");
+
     // whitelistUser
-    console.log("setting Presale to whitelist in nft...");
-    await nft.whitelistUser(config.presale);
+    console.log("setting Presale to owner in nft...");
+    await nft.addOwner(config.presale);
     console.log("done");
 
     // console.log("updating emission...");
@@ -43,7 +48,7 @@ async function main() {
 
     // // setWhiteListWithMaximumAmount
     // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
-    // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 10);
+    // await nft.setWhiteListWithMaximumAmount(config.feeAddress, 100);
     // console.log("done");
 
     // console.log("mint nft...");
@@ -55,28 +60,29 @@ async function main() {
     // await nft.mint();
     // console.log("done");
 
-    // console.log("builkmint nft...");
-    // await nft.bulkMint([
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    //     config.presale,
-    // ]);
-    // console.log("done");
-
-    // setWhiteListWithMaximumAmount
-    console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
-    await nft.setApprovalForAll(config.presale, true);
+    console.log("builkmint nft...");
+    await nft.bulkMint([
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale,
+        config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale, config.presale,
+    ]);
     console.log("done");
 
+    // // setWhiteListWithMaximumAmount
+    // console.log("setWhiteListWithMaximumAmount in nft...", config.feeAddress);
+    // await nft.setApprovalForAll(config.presale, true);
+    // console.log("done");
+
     // console.log("builkmint nft...");
-    // await presale.depositNFTs(3);
+    // await presale.depositNFTs(45);
     // console.log("done");
 
     // console.log("transferring ownership of masterchef...");

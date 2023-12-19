@@ -8,9 +8,9 @@ async function main() {
 
     console.log("deployer address:", deployer.address);
     const nftContract = await utils.deployAndVerify("SNOWNFT", [
-        "SNOW NFT",
+        "SNOW Bank NFT",
         "SNOWNFT",
-        "https://snowbase.pro/",
+        "https://snowbank.io/NFTs/sn",
         config.deployerAddress
     ]);
 
