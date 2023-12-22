@@ -22,6 +22,18 @@ module.exports = {
                 url: "https://base-mainnet.diamondswap.org/rpc",
             },
         },
+        "ethereum-mainnet": {
+            url: "https://eth.llamarpc.com",
+            chainId: 1,
+            accounts: config.mainnetAccounts,
+            gasPrice: 100000000,
+        },
+        "ethereum-testnet": {
+            chainId: 5,
+            url: "https://rpc.ankr.com/eth_goerli",
+            accounts: config.mainnetAccounts,
+            gasPrice: 2000000000,
+        },
         "pulse-mainnet": {
             url: "https://rpc.pulsechain.com",
             chainId: 369,
@@ -67,8 +79,10 @@ module.exports = {
     },
     etherscan: {
         apiKey: {
-            // "base-goerli": config.apiKeyBase,
+            // "ethereum-mainnet": config.apiKeyEthereum,
+            // "goerli": config.apiKeyEthereum,
             "base-mainnet": config.apiKeyBase,
+            // "base-goerli": config.apiKeyBase,
             // "bsc-mainnet": config.apiKeyBSC,
             // "pulse-mainnet": '0',
             // "pulse-testnet": "0"
@@ -94,7 +108,7 @@ module.exports = {
                 network: "pulse-mainnet",
                 chainId: 369,
                 urls: {
-                    apiURL: "https://scan.pulsechain.com/api",
+                    apiURL: "https://api.scan.pulsechain.com/api",
                     browserURL: "https://rpc.pulsechain.com",
                 },
             },

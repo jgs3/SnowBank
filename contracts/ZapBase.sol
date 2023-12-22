@@ -5,11 +5,14 @@
 
 
 
+<<<<<<< HEAD
 
 
 
 
 
+=======
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
 pragma solidity 0.8.15;
 
 import "./pancakeSwap/interfaces/IPancakeFactory.sol";
@@ -26,7 +29,11 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+<<<<<<< HEAD
 import "./GEMToken.sol";
+=======
+import "./SnowToken.sol";
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
 
 // Part: ZapBase
 
@@ -188,7 +195,11 @@ contract ZapBase is MultipleOperator, ReentrancyGuard {
             (address(_targetToken) != address(mainTokenLP))
         ) {
             //Calculate tax variables.
+<<<<<<< HEAD
             uint256 tokenTaxRate = GEMToken(_inputToken).getCurrentTaxRate();
+=======
+            uint256 tokenTaxRate = SnowToken(_inputToken).getCurrentTaxRate();
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
             uint256 taxedAmount = _amount.mul(tokenTaxRate).div(10000);
             //Halve the taxed amount if the target token is an LP token.
             if (tokenType[_targetToken] == TokenType.LP) {

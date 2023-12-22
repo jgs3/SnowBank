@@ -8,7 +8,11 @@ const config = {
     devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     masterChefAddress: "0xbd47AF44583224A76cF5E23A3aBDC4b7ACeF12A8",
+<<<<<<< HEAD
     gem: "0x7c1f5FAC2Ed605Ba8818dEE87dC41c80674F9f68",
+=======
+    snow: "0x7c1f5FAC2Ed605Ba8818dEE87dC41c80674F9f68",
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
     usdc: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
     weth: "0x4200000000000000000000000000000000000006",
     dai: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
@@ -24,6 +28,7 @@ async function main() {
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
 
+<<<<<<< HEAD
     const gemAlbPair = await factory.getPair(config.alb, config.gem);
     const gemSushiPair = await factory.getPair(config.sushi, config.gem);
     const gemUniPair = await factory.getPair(config.uni, config.gem);
@@ -40,33 +45,70 @@ async function main() {
     await masterChef.add(80, gemUniPair, 200, false, false);
 
     const gemEthPool = {
+=======
+    const snowAlbPair = await factory.getPair(config.alb, config.snow);
+    const snowSushiPair = await factory.getPair(config.sushi, config.snow);
+    const snowUniPair = await factory.getPair(config.uni, config.snow);
+    console.log({
+        snowAlbPair: snowAlbPair,
+        snowSushiPair: snowSushiPair,
+        snowUniPair: snowUniPair,
+    });
+    const masterChef = await ethers.getContractAt("SnowMasterChef", config.masterChefAddress);
+    // await masterChef.add(500, lfgWethPair, 100, false, false);
+    // await masterChef.add(250, usdcWethPair, 300, false, false);
+    await masterChef.add(80, snowAlbPair, 200, false, false);
+    await masterChef.add(80, snowSushiPair, 200, false, false);
+    await masterChef.add(80, snowUniPair, 200, false, false);
+
+    const snowEthPool = {
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
         pid: 3,
         allocation: 200,
         depositFee: 200,
         withDepositDiscount: true,
     };
+<<<<<<< HEAD
     const gemDaiPool = {
+=======
+    const snowDaiPool = {
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
         pid: 3,
         allocation: 120,
         depositFee: 200,
         withDepositDiscount: true,
     };
+<<<<<<< HEAD
     const gemUsdcPool = {
+=======
+    const snowUsdcPool = {
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
         pid: 3,
         allocation: 120,
         depositFee: 200,
         withDepositDiscount: true,
     };
+<<<<<<< HEAD
     const gemMimPool = {
+=======
+    const snowMimPool = {
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
         pid: 3,
         allocation: 120,
         depositFee: 200,
         withDepositDiscount: true,
     };
+<<<<<<< HEAD
     await setPool(masterChef, gemEthPool, true);
     await setPool(masterChef, gemDaiPool, true);
     await setPool(masterChef, gemUsdcPool, true);
     await setPool(masterChef, gemMimPool, true);
+=======
+    await setPool(masterChef, snowEthPool, true);
+    await setPool(masterChef, snowDaiPool, true);
+    await setPool(masterChef, snowUsdcPool, true);
+    await setPool(masterChef, snowMimPool, true);
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
 
     console.log("done");
 }

@@ -7,6 +7,11 @@
 
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
 pragma solidity ^0.8.15;
 
 // helper methods for interacting with ERC20 tokens and sending ETH that do not consistently return true/false

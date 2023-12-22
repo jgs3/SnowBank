@@ -1,12 +1,13 @@
 import { ethers } from "hardhat";
-const utils = require("../scripts/utils");
-
 import { config } from "./config";
+
+const utils = require("../scripts/utils");
 
 async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("deployer address:", deployer.address);
+<<<<<<< HEAD
     // const nftContract = await utils.deployAndVerify("GEMNFT", [
     //     "GEM NFT",
     //     "GEMNFT",
@@ -214,6 +215,14 @@ async function main() {
     const tx = await nftContract.setWhiteListsWithMaximumAmount(addresses, amounts);
     await tx.wait()
     console.log("done");
+=======
+    const nftContract = await utils.deployAndVerify("SNOWNFT", [
+        "SNOW Bank NFT",
+        "SNOWNFT",
+        "https://snowbank.io/NFTs/sn",
+        config.deployerAddress
+    ]);
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
 
     console.log({
         nftContract: nftContract.address,

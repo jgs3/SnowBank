@@ -9,7 +9,11 @@ const config = {
     devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     masterChefAddress: "0x182008d5e9A470141f4C72720D2E203D6d87372c",
+<<<<<<< HEAD
     gem: "0x32D758d16Eef72fF7447b9Dd94304A2b222cd77f",
+=======
+    snow: "0x32D758d16Eef72fF7447b9Dd94304A2b222cd77f",
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
     usdc: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
     weth: "0x4200000000000000000000000000000000000006",
     dai: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
@@ -22,9 +26,15 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("Deployer address:", deployer.address);
 
+<<<<<<< HEAD
     const masterChef = await ethers.getContractAt("GemMasterChef", config.masterChefAddress);
 
     // const pool = utils.getPoolConfigByName("gem");
+=======
+    const masterChef = await ethers.getContractAt("SnowMasterChef", config.masterChefAddress);
+
+    // const pool = utils.getPoolConfigByName("snow");
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
     await setPool(
         masterChef,
         {

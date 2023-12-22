@@ -11,15 +11,26 @@ async function main() {
     await zapper.setCoreValues(
         config.router,
         config.factory,
+<<<<<<< HEAD
         config.gem,
+=======
+        config.snow,
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
         config.baseLp,
         config.weth
     );
 
+<<<<<<< HEAD
     // weth - gem
     console.log("set swap path for weth-gem");
     await zapper.setSwapPath(config.gem, config.weth, [config.gem, config.weth]);
     await zapper.setSwapPath(config.weth, config.gem, [config.weth, config.gem]);
+=======
+    // weth - snow
+    console.log("set swap path for weth-snow");
+    await zapper.setSwapPath(config.snow, config.weth, [config.snow, config.weth]);
+    await zapper.setSwapPath(config.weth, config.snow, [config.weth, config.snow]);
+>>>>>>> 17ff097522f1332e2fdfe3320d2d32e04d4477f4
 
 
     console.log({
