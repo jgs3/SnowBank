@@ -10,7 +10,7 @@ export const config = {
     owner: "0x614cEbe8fdA55f65f8fd365e2c89c462239c707A",
 
     // // on test
-    // devAddress: "0x9de6eFf5Be829B12E8343d155EB17340a56BcC61",
+    // devAddressd: "0x614cEbe8fdA55f65f8fd365e2c89c462239c707A",
     // feeAddress1: "0x9de6eFf5Be829B12E8343d155EB17340a56BcC61",
 
     deployerAddress: "0x9de6eFf5Be829B12E8343d155EB17340a56BcC61",
@@ -19,6 +19,7 @@ export const config = {
 
     gem: "0x0D3f4e01E7d782eC321E3022B5E8F11709D74180",
     baseLp: "0x8f6cd16aCAD640F4a5f29310eeB6D7CC79e3A47A",
+
     // nft: "0xCD2aA3A27fa0eDF880391C3846BE438e2A1E0B49",
     zap: "0x9D50421dfDAdC7d10278b3D0a24edc61480dc40d",
     masterchef: "0x6dDdfE9965aEd0Eaa7B28F05940D15D1c688307f",

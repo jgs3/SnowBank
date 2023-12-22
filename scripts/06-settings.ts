@@ -34,7 +34,7 @@ async function main() {
     // console.log("done");
 
     console.log("updating emission...");
-    await masterchef.updateEmissionRate("500000000000");
+    await masterchef.updateEmissionRate("50000000000000000");
     console.log("done");
 
     // setWhiteListWithMaximumAmount

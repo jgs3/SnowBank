@@ -2,6 +2,7 @@
 
 
 
+
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -22,7 +23,7 @@ contract GEMToken is ERC20, Ownable, ERC20Permit, ERC20Votes {
     uint256 public totalBurned;
 
     uint256 public staticTaxRate = 600;
-    uint256 public MAX_TAX_RATE = 2000;
+    uint256 public MAX_TAX_RATE = 800;
     uint256 public constant duration = 1 days;
 
     mapping(address => bool) public isPair;
