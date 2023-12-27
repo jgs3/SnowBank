@@ -39,3 +39,4 @@ balanceAddr: 0xffffffff
 
 # max amount of value in each randomly generated transaction (100 ETH)
 maxValue: 100000000000000000000
+
