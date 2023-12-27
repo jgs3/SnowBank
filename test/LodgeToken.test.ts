@@ -20,6 +20,7 @@ describe("LodgeToken", function() {
         await token.mint(owner.address, ethers.utils.parseEther("100"))
     })
 
+    
     it("should take sell tax", async function() {
         const pair = await factory.getPair(token.address, weth.address)
         expect(await token.isPair(pair)).equal(true, "pair is not set")
