@@ -5,7 +5,7 @@ export interface EnvResult {
     masterChef: Contract;
     lodgeToken: Contract;
 
-    usdt: Contract;
+    mim: Contract;
     weth: Contract;
 
     router: Contract;

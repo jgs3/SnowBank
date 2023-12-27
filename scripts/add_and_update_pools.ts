@@ -8,7 +8,7 @@ const config = {
     devAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     feeAddress: "0xAE02196968A374A2d1281eD082F7A66b510FA8aD",
     masterChefAddress: "0xbd47AF44583224A76cF5E23A3aBDC4b7ACeF12A8",
-    wild: "0x7c1f5FAC2Ed605Ba8818dEE87dC41c80674F9f68",
+    snow: "0x7c1f5FAC2Ed605Ba8818dEE87dC41c80674F9f68",
     usdc: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
     weth: "0x4200000000000000000000000000000000000006",
     dai: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
@@ -24,49 +24,49 @@ async function main() {
     console.log("deployer address:", deployer.address);
     const factory = await ethers.getContractAt("PancakeFactory", config.factory);
 
-    const wildAlbPair = await factory.getPair(config.alb, config.wild);
-    const wildSushiPair = await factory.getPair(config.sushi, config.wild);
-    const wildUniPair = await factory.getPair(config.uni, config.wild);
+    const snowAlbPair = await factory.getPair(config.alb, config.snow);
+    const snowSushiPair = await factory.getPair(config.sushi, config.snow);
+    const snowUniPair = await factory.getPair(config.uni, config.snow);
     console.log({
-        wildAlbPair: wildAlbPair,
-        wildSushiPair: wildSushiPair,
-        wildUniPair: wildUniPair,
+        snowAlbPair: snowAlbPair,
+        snowSushiPair: snowSushiPair,
+        snowUniPair: snowUniPair,
     });
-    const masterChef = await ethers.getContractAt("WildMasterChef", config.masterChefAddress);
+    const masterChef = await ethers.getContractAt("SnowMasterChef", config.masterChefAddress);
     // await masterChef.add(500, lfgWethPair, 100, false, false);
     // await masterChef.add(250, usdcWethPair, 300, false, false);
-    await masterChef.add(80, wildAlbPair, 200, false, false);
-    await masterChef.add(80, wildSushiPair, 200, false, false);
-    await masterChef.add(80, wildUniPair, 200, false, false);
+    await masterChef.add(80, snowAlbPair, 200, false, false);
+    await masterChef.add(80, snowSushiPair, 200, false, false);
+    await masterChef.add(80, snowUniPair, 200, false, false);
 
-    const wildEthPool = {
+    const snowEthPool = {
         pid: 3,
         allocation: 200,
         depositFee: 200,
         withDepositDiscount: true,
     };
-    const wildDaiPool = {
+    const snowDaiPool = {
         pid: 3,
         allocation: 120,
         depositFee: 200,
         withDepositDiscount: true,
     };
-    const wildUsdcPool = {
+    const snowUsdcPool = {
         pid: 3,
         allocation: 120,
         depositFee: 200,
         withDepositDiscount: true,
     };
-    const wildMimPool = {
+    const snowMimPool = {
         pid: 3,
         allocation: 120,
         depositFee: 200,
         withDepositDiscount: true,
     };
-    await setPool(masterChef, wildEthPool, true);
-    await setPool(masterChef, wildDaiPool, true);
-    await setPool(masterChef, wildUsdcPool, true);
-    await setPool(masterChef, wildMimPool, true);
+    await setPool(masterChef, snowEthPool, true);
+    await setPool(masterChef, snowDaiPool, true);
+    await setPool(masterChef, snowUsdcPool, true);
+    await setPool(masterChef, snowMimPool, true);
 
     console.log("done");
 }

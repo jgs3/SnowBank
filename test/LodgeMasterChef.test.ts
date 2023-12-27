@@ -16,15 +16,15 @@ describe("MasterChef test", function () {
 
 
         const MockToken = await ethers.getContractFactory("MockToken");
-        const usdt = await MockToken.deploy("USDT", "USDT");
+        const mim = await MockToken.deploy("mim", "mim");
         const weth = await MockToken.deploy("WETH", "WETH");
-        usdt.mint(alice.address, ethers.utils.parseUnits("1000", 18));
+        mim.mint(alice.address, ethers.utils.parseUnits("1000", 18));
         weth.mint(alice.address, ethers.utils.parseUnits("1000", 18));
 
-        usdt.mint(bob.address, ethers.utils.parseUnits("1000", 18));
+        mim.mint(bob.address, ethers.utils.parseUnits("1000", 18));
         weth.mint(bob.address, ethers.utils.parseUnits("1000", 18));
 
-        usdt.mint(partner.address, ethers.utils.parseUnits("1000", 18));
+        mim.mint(partner.address, ethers.utils.parseUnits("1000", 18));
         weth.mint(partner.address, ethers.utils.parseUnits("1000", 18));
 
         const Factory = await ethers.getContractFactory("PancakeFactory");
@@ -50,7 +50,7 @@ describe("MasterChef test", function () {
 
         await lodgeToken.transferOwnership(masterChef.address);
 
-        await masterChef.add(1000, usdt.address, 400, false, true);
+        await masterChef.add(1000, mim.address, 400, false, true);
         await masterChef.add(500, weth.address, 400, false, false);
 
         await masterChef.setPartner(partner.address, true);
@@ -63,16 +63,16 @@ describe("MasterChef test", function () {
             bob,
             dev,
             weth,
-            usdt,
+            mim,
             partner,
             router
         };
     }
 
     it("should take fee on deposit", async () => {
-        const { masterChef, alice, usdt } = await loadFixture(prepareEnv);
+        const { masterChef, alice, mim } = await loadFixture(prepareEnv);
         const amount = ethers.utils.parseUnits("1000", 18);
-        await usdt.connect(alice).approve(masterChef.address, amount);
+        await mim.connect(alice).approve(masterChef.address, amount);
         await masterChef.connect(alice).deposit(0, amount, 0, []);
 
         const aliceInfo = await masterChef.userInfo(0, alice.address);
@@ -80,11 +80,11 @@ describe("MasterChef test", function () {
     });
 
     it("should correctly work with zero deposit fee", async () => {
-        const { masterChef, alice, usdt } = await loadFixture(prepareEnv);
+        const { masterChef, alice, mim } = await loadFixture(prepareEnv);
         await masterChef.set(0, 1000, 0, true, true);
 
         const amount = ethers.utils.parseUnits("1000", 18);
-        await usdt.connect(alice).approve(masterChef.address, amount);
+        await mim.connect(alice).approve(masterChef.address, amount);
         await masterChef.connect(alice).deposit(0, amount, 0, []);
 
         const aliceInfo = await masterChef.userInfo(0, alice.address);
@@ -93,24 +93,24 @@ describe("MasterChef test", function () {
 
     describe("whitelist", () => {
         it("should take discounted fee on deposit from whitelist", async () => {
-            const { masterChef, alice, bob, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, alice, bob, mim } = await loadFixture(prepareEnv);
             const merkleTree = StandardMerkleTree.of([[alice.address], [bob.address]], ["address"]);
             await masterChef.setWhitelistMerkleRoot(merkleTree.root);
             const proof = merkleTree.getProof([alice.address]);
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
             await masterChef.connect(alice).deposit(0, amount, 0, proof);
             const aliceInfo = await masterChef.userInfo(0, alice.address);
             expect(aliceInfo.amount).equal(parseUnits("980", 18));
         });
 
         it("should make discount after project launch", async () => {
-            const { masterChef, alice, bob, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, alice, bob, mim } = await loadFixture(prepareEnv);
             const merkleTree = StandardMerkleTree.of([[alice.address], [bob.address]], ["address"]);
             await masterChef.setWhitelistMerkleRoot(merkleTree.root);
             const proof = merkleTree.getProof([alice.address]);
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
             const launchTime = await masterChef.startTime();
             await time.increase(86400);
             await masterChef.connect(alice).deposit(0, amount, 0, proof);
@@ -124,10 +124,10 @@ describe("MasterChef test", function () {
             const oneDay = 86400;
             const month = oneDay * 30;
 
-            const { masterChef, alice, bob, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, alice, bob, mim } = await loadFixture(prepareEnv);
 
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
             await expect(
                 masterChef.connect(alice).deposit(0, amount, month + 1, [])
             ).to.be.revertedWith("wrong lock period");
@@ -137,10 +137,10 @@ describe("MasterChef test", function () {
             const oneDay = 86400;
             const month = oneDay * 30;
 
-            const { masterChef, alice, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, alice, mim } = await loadFixture(prepareEnv);
 
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
             await masterChef.connect(alice).deposit(0, amount, month, []);
 
             const aliceInfo = await masterChef.userInfo(0, alice.address);
@@ -165,10 +165,10 @@ describe("MasterChef test", function () {
             const oneDay = 86400;
             const month = oneDay * 30;
 
-            const { masterChef, alice, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, alice, mim } = await loadFixture(prepareEnv);
 
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
             const tx = await masterChef.connect(alice).deposit(0, amount, month, []);
             const waitedTx = await tx.wait();
             const blockNumber = waitedTx.blockNumber;
@@ -182,10 +182,10 @@ describe("MasterChef test", function () {
             const oneDay = 86400;
             const month = oneDay * 30;
 
-            const { masterChef, alice, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, alice, mim } = await loadFixture(prepareEnv);
 
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
             await masterChef.connect(alice).deposit(0, amount, month, []);
 
             await expect(
@@ -202,10 +202,10 @@ describe("MasterChef test", function () {
             const oneDay = 86400;
             const month = oneDay * 30;
 
-            const { masterChef, alice, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, alice, mim } = await loadFixture(prepareEnv);
 
             const amount = ethers.utils.parseUnits("100", 18);
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
 
             await masterChef.connect(alice).deposit(0, amount, month, []);
 
@@ -213,7 +213,7 @@ describe("MasterChef test", function () {
 
             let aliceInfo = await masterChef.userInfo(0, alice.address);
             const { unlockTime } = aliceInfo;
-            await usdt.connect(alice).approve(masterChef.address, amount);
+            await mim.connect(alice).approve(masterChef.address, amount);
             await masterChef.connect(alice).deposit(0, amount, 3 * month, []);
 
             aliceInfo = await masterChef.userInfo(0, alice.address);
@@ -302,9 +302,9 @@ describe("MasterChef test", function () {
 
     describe("partners", () => {
         it("should not take deposit fee for a partner", async () => {
-            const { masterChef, partner, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, partner, mim } = await loadFixture(prepareEnv);
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(partner).approve(masterChef.address, amount);
+            await mim.connect(partner).approve(masterChef.address, amount);
             await masterChef.connect(partner).deposit(0, amount, 0, []);
 
             const aliceInfo = await masterChef.userInfo(0, partner.address);
@@ -312,9 +312,9 @@ describe("MasterChef test", function () {
         });
 
         it("should take deposit fee after cancelling partnership", async () => {
-            const { masterChef, partner, usdt } = await loadFixture(prepareEnv);
+            const { masterChef, partner, mim } = await loadFixture(prepareEnv);
             const amount = ethers.utils.parseUnits("1000", 18);
-            await usdt.connect(partner).approve(masterChef.address, amount);
+            await mim.connect(partner).approve(masterChef.address, amount);
             await masterChef.setPartner(partner.address, false);
             await masterChef.connect(partner).deposit(0, amount, 0, []);
 
