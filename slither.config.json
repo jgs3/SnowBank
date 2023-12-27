@@ -5,3 +5,4 @@
     "exclude_high": false,
     "filter_paths": "(node_modules/|test/|tests/|mocks/|echidna-test/)"
 }
+

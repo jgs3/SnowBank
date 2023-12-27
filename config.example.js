@@ -23,3 +23,4 @@ module.exports = {
     // deploy constants that used in scripts
     initialSupply: "1000",
 };
+

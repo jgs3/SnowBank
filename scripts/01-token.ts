@@ -13,6 +13,7 @@ async function main() {
     await token.mint(config.feeAddress, ethers.utils.parseEther("5000"));
 
     // const snowwethPair = await factory.getPair(config.weth, token.address);
+    
 
     console.log({
         token: token.address,

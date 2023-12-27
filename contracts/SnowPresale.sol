@@ -89,7 +89,7 @@ contract SNOWPresale is IERC721Receiver, ReentrancyGuard {
     function buyNFT(uint256 _NFTID) public payable nonReentrant {
         if (!enabled || sale_finalized) revert SaleIsNotActive();
         require(msg.value >= NFTPrice, "Not enough Ether provided.");
-        // require(NFTs_per_user[msg.sender] == 0, "Exceed max per user NFT amount");
+        require(NFTs_per_user[msg.sender] == 0, "Exceed max per user NFT amount");
         SNOWNFT_CONTRACT.whitelistUser(msg.sender);
         IERC721(NFT).safeTransferFrom(address(this), msg.sender, _NFTID);
         NFTs_per_user[msg.sender] = NFTs_per_user[msg.sender] + 1;
